@@ -30,13 +30,13 @@ $ ninja install
 file to describe the necessary compiler and linker flags. If you are
 using Meson:
 
-```
+```meson
 mutest_dep = dependency('mutest-1')
 ```
 
 And if you're using Autotools:
 
-```
+```m4
 PKG_CHECK_MODULES(MUTEST, [mutest-1])
 AC_SUBST(MUTEST_CFLAGS)
 AC_SUBST(MUTEST_LIBS)
@@ -45,7 +45,7 @@ AC_SUBST(MUTEST_LIBS)
 You can also depend on µTest as a subproject in existing Meson-based
 projects through a wrap file:
 
-```
+```sh
 $ cat >subprojects/mutest.wrap <<HERE
 > [wrap-git]
 > directory=mutest
@@ -83,7 +83,7 @@ containing the description of the suite, and a function pointer:
 
 ```cpp
 MUTEST_MAIN (
-  mutest_describe ("Hello World", hello_suite);
+  mutest_describe ("General", general_suite);
 )
 ```
 
@@ -92,9 +92,11 @@ string containing the description of the spec, and a function pointer:
 
 ```cpp
 static void
-hello_suite (mutest_suite_t *suite)
+general_suite (mutest_suite_t *suite)
 {
-  mutest_it ("hello_world()", call_hello_world);
+  mutest_it ("contains at least a spec with an expectation", general_spec);
+  mutest_it ("can contain multiple specs", another_spec);
+  mutest_it ("should be skipped", skip_spec);
 }
 ```
 
@@ -103,75 +105,83 @@ satisfied:
 
 ```cpp
 static void
-call_hello_world (mutest_spec_t *spec)
+general_spec (mutest_spec_t *spec)
 {
-  const char *str = hello_world ();
+  bool a = true;
 
-  mutest_expect ("Returns 'hello, world'",
-  		 mutest_string_value (str),
-		 mutest_to_be_string, "hello, world",
-		 NULL);
+  mutest_expect ("a is true",
+                 mutest_bool_value (a),
+                 mutest_to_be_true,
+                 NULL);
+  mutest_expect ("a is not false",
+                 mutest_bool_value (a),
+                 mutest_not, mutest_to_be_false,
+                 NULL);
+}
+```
 
-  // You can chain multiple expectations together; they must
-  // all be satisfied for the expectation to succeed.
-  mutest_expect ("Contains all components",
-  		 mutest_string_value (str),
-		 mutest_to_start_with_string, "hello",
-		 mutest_to_contain_string, ",",
-		 mutest_to_end_with_string, "world",
-		 NULL);
+Expectations match the expected type and value of a variable against the
+some *expected* value specified in the test suite; some expectations can
+be made of multiple conditions that need to be satisfied at the same time:
 
-  // You can also negate the condition.
-  mutest_expect ("Does not contain 'goodbye'",
-  		 mutest_string_value (str),
-		 mutest_not, mutest_to_contain_string, "goodbye",
-		 NULL);
+```cpp
+static void
+another_spec (mutest_spec_t *spec)
+{
+  const char *str = "hello, world";
 
-  // Or you can skip an expectation altogether.
-  mutest_expect ("Should be skipped",
-  		 mutest_string_value (str),
-		 mutest_skip,
-		 NULL);
+  mutest_expect ("str contains 'hello'",
+                 mutest_string_value (str),
+                 mutest_to_contain_string, "hello",
+                 NULL);
+  mutest_expect ("str contains 'world'",
+                 mutest_string_value (str),
+                 mutest_to_contain_string, "world",
+                 NULL);
+  mutest_expect ("contains all fragments",
+                 mutest_string_value (str),
+                 mutest_to_start_with_string, "hello",
+                 mutest_to_contain_string, ",",
+                 mutest_to_end_with_string, "world",
+                 NULL);
+}
+```
+
+Some expectations can also be programmatically skipped:
+
+```cpp
+static void
+skip_spec (mutest_spec_t *spec)
+{
+  mutest_expect ("skip this test",
+                 mutest_bool_value (true),
+                 mutest_skip,
+                 NULL);
 }
 ```
 
 Building the test case and running it will generate the following result
 with the default formatter:
 
-```sh
-$ ./hello
-
-  Hello World
-    hello_world()
-      ✓ Returns 'hello, world'
-      ✓ Contains all components
-      ✓ Does not contain 'goodbye'
-      - Should be skipped
-
-    3 passing (2 ms)
-    1 skipped
-    0 failing
-
-  Total
-  3 passing (3 ms)
-  1 skipped
-  0 failing
-
-```
+![default output](./mutest-mocha-format.png)
 
 If you have a [TAP](https://testanything.org/) harness already in place, you
 should use the TAP formatted, by exporting the `MUTEST_OUTPUT=tap` variable
 in your test environment:
 
-```sh
-$ MUTEST_OUTPUT=tap ./hello
-# Hello World
-# hello_world()
-ok - Returns 'hello, world'
-ok - Contains all components
-ok - Does not contain 'goodbye'
-ok # skip: Should be skipped
-1..4
+```tap
+MUTEST_OUTPUT=tap ./tests/general
+# General
+# contains at least a spec with an expectation
+ok 1 a is true
+ok 2 a is not false
+# can contain multiple specs
+ok 3 str contains 'hello'
+ok 4 str contains 'world'
+ok 5 contains all fragments
+# should be skipped
+ok 6 # skip: skip this test
+1..6
 ```
 
 ## License
