@@ -1,0 +1,26 @@
+sudo: false
+
+os:
+  - linux
+
+services:
+  - docker
+
+compiler:
+  - gcc
+  - clang
+
+language:
+  - c
+
+before_install:
+  - docker pull ebassi/mutestci
+
+before_script:
+  - echo FROM ebassi/mutestci > Dockerfile
+  - echo ADD . /root >> Dockerfile
+  - echo WORKDIR /root >> Dockerfile
+  - docker build -f Dockerfile -t withgit .
+
+script:
+  - docker run withgit /bin/sh -c "CC=$CC sh -x .travis-ci/run-tests.sh"

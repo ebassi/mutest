@@ -1,6 +1,6 @@
 ## µTest - A small C testing library
 
-**Linux**: [![Build Status](https://travis-ci.org/ebassi/graphene.svg?branch=master)](https://travis-ci.org/ebassi/graphene)
+**Linux**: [![Build Status](https://travis-ci.org/ebassi/mutest.svg?branch=master)](https://travis-ci.org/ebassi/mutest)
 
 **Windows**: ...
 

@@ -1,0 +1,28 @@
+FROM debian:stretch-slim
+MAINTAINER Emmanuele Bassi <ebassi@gmail.com>
+
+RUN apt-get update -qq \
+    && apt-get install --no-install-recommends -qq -y \
+        clang \
+        gcc \
+        locales \
+        ninja-build \
+        pkg-config \
+        python3 \
+        python3-pip \
+        python3-setuptools \
+        python3-wheel \
+    && rm -rf /usr/share/doc/* /usr/share/man/*
+
+RUN locale-gen C.UTF-8 && /usr/sbin/update-locale LANG=C.UTF-8
+
+ENV LANG=C.UTF-8 LANGUAGE=C.UTF-8 LC_ALL=C.UTF-8
+
+RUN pip3 install meson
+
+ARG HOST_USER_ID=5555
+ENV HOST_USER_ID ${HOST_USER_ID}
+RUN useradd -u $HOST_USER_ID -ms /bin/bash user
+
+USER user
+WORKDIR /home/user
