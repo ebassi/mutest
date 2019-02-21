@@ -1,0 +1,437 @@
+#include "config.h"
+
+#include "mutest-private.h"
+
+#include <fcntl.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <time.h>
+
+#define ANSI_ESCAPE             "\033"
+
+/* Effects */
+typedef enum {
+  TERM_EFFECT_NONE = 0,
+  TERM_EFFECT_BOLD = 1,
+  TERM_EFFECT_DIM = 2,
+  TERM_EFFECT_UNDERLINE = 3,
+  TERM_EFFECT_BLINK = 4,
+  TERM_EFFECT_INVERT = 5,
+  TERM_EFFECT_HIDDEN = 6
+} term_effect_t;
+
+/* Foreground colors */
+typedef enum {
+  TERM_FG_DEFAULT = 39,
+
+  TERM_FG_BLACK = 30,
+  TERM_FG_RED = 31,
+  TERM_FG_GREEN = 32,
+  TERM_FG_YELLOW = 33,
+  TERM_FG_BLUE = 34,
+  TERM_FG_MAGENTA = 35,
+  TERM_FG_CYAN = 36,
+  TERM_FG_LIGHT_GRAY = 37,
+  TERM_FG_DARK_GRAY = 90,
+  TERM_FG_LIGHT_RED = 91,
+  TERM_FG_LIGHT_GREEN = 92,
+  TERM_FG_LIGHT_YELLOW = 93,
+  TERM_FG_LIGHT_BLUE = 94,
+  TERM_FG_LIGHT_MAGENTA = 95,
+  TERM_FG_LIGHT_CYAN = 96,
+  TERM_FG_WHITE = 97
+} term_fg_color_t;
+
+/* Background colors */
+typedef enum {
+  TERM_BG_DEFAULT = 49,
+
+  TERM_BG_BLACK = 40,
+  TERM_BG_RED = 41,
+  TERM_BG_GREEN = 42,
+  TERM_BG_YELLOW = 43,
+  TERM_BG_BLUE = 44,
+  TERM_BG_MAGENTA = 45,
+  TERM_BG_CYAN = 46,
+  TERM_BG_LIGHT_GRAY = 47,
+  TERM_BG_DARK_GRAY = 100,
+  TERM_BG_LIGHT_RED = 101,
+  TERM_BG_LIGHT_GREEN = 102,
+  TERM_BG_LIGHT_YELLOW = 103,
+  TERM_BG_LIGHT_BLUE = 104,
+  TERM_BG_LIGHT_MAGENTA = 105,
+  TERM_BG_LIGHT_CYAN = 106,
+  TERM_BG_WHITE = 107
+} term_bg_color_t;
+
+#define MUTEST_COLOR_GREEN      ANSI_ESCAPE "[1;32m"
+#define MUTEST_COLOR_BLUE       ANSI_ESCAPE "[1;34m"
+#define MUTEST_COLOR_YELLOW     ANSI_ESCAPE "[1;33m"
+#define MUTEST_COLOR_RED        ANSI_ESCAPE "[1;31m"
+#define MUTEST_COLOR_NONE       ANSI_ESCAPE "[0m"
+#define MUTEST_COLOR_LIGHT_GREY ANSI_ESCAPE "[1;37m"
+
+#define MUTEST_BOLD_DEFAULT             ANSI_ESCAPE "[1;39m"
+#define MUTEST_UNDERLINE_DEFAULT        ANSI_ESCAPE "[4;39m"
+#define MUTEST_DIM_DEFAULT              ANSI_ESCAPE "[2;39m"
+
+// mutest_get_current_time:
+//
+// Returns: the current time, in microseconds
+int64_t
+mutest_get_current_time (void)
+{
+  struct timespec ts;
+  int res;
+
+  res = clock_gettime (CLOCK_MONOTONIC, &ts);
+
+  if (res == 0)
+    return 0;
+
+  return (((int64_t) ts.tv_sec) * 1000000) + (ts.tv_nsec / 1000);
+}
+
+void
+mutest_print (int fd,
+              const char *first_fragment,
+              ...)
+{
+  va_list args;
+
+  va_start (args, first_fragment);
+  
+  const char *fragment = first_fragment;
+  while (fragment != NULL)
+    {
+      if (fragment[0] != '\0')
+        write (fd, fragment, strlen (fragment));
+
+      fragment = va_arg (args, char *);
+    }
+
+  va_end (args);
+
+  write (fd, "\n", 1);
+}
+
+void
+mutest_assert_message (const char *file,
+                       int         line,
+                       const char *func,
+                       const char *message)
+{
+  char lstr[32];
+
+  /* We can be called by an OOM handler, or a signal handler,
+   * so we should not:
+   *
+   *  - allocate memory
+   *  - re-enter into mutest code
+   */
+  snprintf (lstr, 32, "%d", line);
+
+  if (mutest_use_colors ())
+    mutest_print (STDERR_FILENO,
+                  MUTEST_COLOR_RED, "ERROR", MUTEST_COLOR_NONE, ": ",
+                  file, ":", lstr, ":", func != NULL ? func : "<local>",
+                  " ",
+                  message,
+                  NULL);
+  else
+    mutest_print (STDERR_FILENO,
+                  "ERROR: ", file, ":", lstr, ":", func != NULL ? func : "<local>", " ",
+                  message,
+                  NULL);
+
+  abort ();
+}
+
+static double
+format_time (int64_t t,
+             const char **unit)
+{
+  if (t > 1000000)
+    {
+      *unit = "s";
+      return (double) t / 1000000.0;
+    }
+
+  if (t > 1000)
+    {
+      *unit = "ms";
+      return (double) t / 1000.0;
+    }
+
+  *unit = "µs";
+  return (double) t;
+}
+
+static void
+mocha_suite_preamble (mutest_suite_t *suite)
+{
+  if (mutest_use_colors ())
+    mutest_print (STDOUT_FILENO,
+                  "\n",
+                  "  ",
+                  MUTEST_BOLD_DEFAULT, suite->description, MUTEST_COLOR_NONE,
+                  NULL);
+  else
+    mutest_print (STDOUT_FILENO,
+                  "\n",
+                  "  ", suite->description,
+                  NULL);
+}
+
+static void
+mocha_expect_result (mutest_expect_t *expect)
+{
+  switch (expect->result)
+    {
+    case MUTEST_RESULT_PASS:
+      if (mutest_use_colors ())
+        mutest_print (STDOUT_FILENO,
+                      "     ",
+                      MUTEST_COLOR_GREEN, " ✓ ", MUTEST_DIM_DEFAULT, expect->description,
+                      MUTEST_COLOR_NONE,
+                      NULL);
+      else
+        mutest_print (STDOUT_FILENO,
+                      "      ✓ ", expect->description,
+                      NULL);
+      break;
+
+    case MUTEST_RESULT_FAIL:
+      if (mutest_use_colors ())
+        mutest_print (STDOUT_FILENO,
+                      "     ",
+                      MUTEST_COLOR_RED, " ✗ ", expect->description, MUTEST_COLOR_NONE,
+                      NULL);
+      else
+        mutest_print (STDOUT_FILENO,
+                      "      ✗ ", expect->description,
+                      NULL);
+      break;
+
+    case MUTEST_RESULT_SKIP:
+      if (mutest_use_colors ())
+        mutest_print (STDOUT_FILENO,
+                      "     ",
+                      MUTEST_COLOR_YELLOW, " - ", expect->description, MUTEST_COLOR_NONE,
+                      NULL);
+      else
+        mutest_print (STDOUT_FILENO,
+                      "      - ", expect->description,
+                      NULL);
+      break;
+    }
+}
+
+static void
+mocha_spec_preamble (mutest_spec_t *spec)
+{
+  mutest_print (STDOUT_FILENO,
+                "    ",
+                spec->description,
+                NULL);
+}
+
+static void
+mocha_spec_results (mutest_spec_t *spec)
+{
+  char passing_s[128], failing_s[128], skipped_s[128];
+
+  snprintf (passing_s, 128, "%d passing", spec->pass);
+  snprintf (failing_s, 128, "%d failing", spec->fail);
+  snprintf (skipped_s, 128, "%d skipped", spec->skip);
+
+  const char *delta_u;
+  double delta_t;
+  char delta_s[128];
+
+  delta_t = format_time (spec->end_time - spec->start_time, &delta_u);
+  snprintf (delta_s, 128, "(%.2g %s)", delta_t, delta_u);
+
+  if (mutest_use_colors ())
+    mutest_print (STDOUT_FILENO,
+                  "\n",
+                  "    ",
+                  MUTEST_COLOR_GREEN, passing_s, MUTEST_COLOR_NONE, " ",
+                  MUTEST_COLOR_LIGHT_GREY, delta_s, MUTEST_COLOR_NONE, "\n",
+                  "    ",
+                  MUTEST_COLOR_YELLOW, skipped_s, MUTEST_COLOR_NONE, "\n",
+                  "    ",
+                  MUTEST_COLOR_RED, failing_s, MUTEST_COLOR_NONE, "\n",
+                  NULL);
+  else
+    mutest_print (STDOUT_FILENO,
+                  "\n",
+                  "    ", passing_s, " ", delta_s, "\n",
+                  "    ", skipped_s, "\n",
+                  "    ", failing_s, "\n",
+                  NULL);
+}
+
+static void
+mocha_total_results (mutest_state_t *state)
+{
+  char passing_s[128], failing_s[128], skipped_s[128];
+
+  snprintf (passing_s, 128, "%d passing", state->pass);
+  snprintf (failing_s, 128, "%d failing", state->fail);
+  snprintf (skipped_s, 128, "%d skipped", state->skip);
+
+  const char *delta_u;
+  double delta_t;
+  char delta_s[128];
+
+  delta_t = format_time (state->end_time - state->start_time, &delta_u);
+  snprintf (delta_s, 128, "(%.2g %s)", delta_t, delta_u);
+
+  if (mutest_use_colors ())
+    mutest_print (STDOUT_FILENO,
+                  "\n",
+                  "  ",
+                  MUTEST_UNDERLINE_DEFAULT, "Total", MUTEST_COLOR_NONE, "\n",
+                  "  ",
+                  MUTEST_COLOR_GREEN, passing_s, MUTEST_COLOR_NONE, " ",
+                  MUTEST_COLOR_LIGHT_GREY, delta_s, MUTEST_COLOR_NONE, "\n",
+                  "  ",
+                  MUTEST_COLOR_YELLOW, skipped_s, MUTEST_COLOR_NONE, "\n",
+                  "  ",
+                  MUTEST_COLOR_RED, failing_s, MUTEST_COLOR_NONE, "\n",
+                  NULL);
+  else
+    mutest_print (STDOUT_FILENO,
+                  "\n",
+                  "  Total\n",
+                  "  ", passing_s, " ", delta_s, "\n",
+                  "  ", skipped_s, "\n",
+                  "  ", failing_s, "\n",
+                  NULL);
+}
+
+static void
+tap_expect_result (mutest_expect_t *expect)
+{
+  switch (expect->result)
+    {
+    case MUTEST_RESULT_PASS:
+      mutest_print (STDOUT_FILENO,
+                    "ok - ", expect->description,
+                    NULL);
+      break;
+
+    case MUTEST_RESULT_FAIL:
+      mutest_print (STDOUT_FILENO,
+                    "not ok - ", expect->description,
+                    NULL);
+      break;
+
+    case MUTEST_RESULT_SKIP:
+      mutest_print (STDOUT_FILENO,
+                    "ok # skip: ", expect->description,
+                    NULL);
+      break;
+    }
+}
+
+static void
+tap_spec_preamble (mutest_spec_t *spec)
+{
+  mutest_print (STDOUT_FILENO, "# ", spec->description, NULL);
+}
+
+static void
+tap_suite_preamble (mutest_suite_t *suite)
+{
+  mutest_print (STDOUT_FILENO, "# ", suite->description, NULL);
+}
+
+static void
+tap_total_results (mutest_state_t *state)
+{
+  if (state->n_tests == state->skip)
+    mutest_print (STDOUT_FILENO, "1..0 # skip", NULL);
+  else
+    {
+      char plan[128];
+
+      snprintf (plan, 128, "1..%d", state->n_tests);
+
+      mutest_print (STDOUT_FILENO, plan, NULL);
+    }
+}
+
+static struct {
+  void (* suite_preamble) (mutest_suite_t *suite);
+  void (* spec_preamble) (mutest_spec_t *spec);
+  void (* expect_result) (mutest_expect_t *expect);
+  void (* spec_results) (mutest_spec_t *spec);
+  void (* total_results) (mutest_state_t *state);
+} output_formatters[] = {
+  [MUTEST_OUTPUT_MOCHA] = {
+    .suite_preamble = mocha_suite_preamble,
+    .spec_preamble = mocha_spec_preamble,
+    .expect_result = mocha_expect_result,
+    .spec_results = mocha_spec_results,
+    .total_results = mocha_total_results,
+  },
+  [MUTEST_OUTPUT_TAP] = {
+    .suite_preamble = tap_suite_preamble,
+    .spec_preamble = tap_spec_preamble,
+    .expect_result = tap_expect_result,
+    .spec_results = NULL,
+    .total_results = tap_total_results,
+  },
+};
+
+void
+mutest_print_suite_preamble (mutest_suite_t *suite)
+{
+  mutest_output_format_t format = mutest_get_output_format ();
+
+  if (output_formatters[format].suite_preamble != NULL)
+    output_formatters[format].suite_preamble (suite);
+}
+
+void
+mutest_print_expect (mutest_expect_t *expect)
+{
+  mutest_output_format_t format = mutest_get_output_format ();
+
+  if (output_formatters[format].expect_result != NULL)
+    output_formatters[format].expect_result (expect);
+}
+
+void
+mutest_print_spec_preamble (mutest_spec_t *spec)
+{
+  mutest_output_format_t format = mutest_get_output_format ();
+
+  if (output_formatters[format].spec_preamble != NULL)
+    output_formatters[format].spec_preamble (spec);
+}
+
+void
+mutest_print_spec_totals (mutest_spec_t *spec)
+{
+  mutest_output_format_t format = mutest_get_output_format ();
+
+  if (output_formatters[format].spec_results != NULL)
+    output_formatters[format].spec_results (spec);
+}
+
+void
+mutest_print_totals (void)
+{
+  mutest_state_t *state = mutest_get_global_state ();
+  mutest_output_format_t format = mutest_get_output_format ();
+
+  if (output_formatters[format].total_results != NULL)
+    output_formatters[format].total_results (state);
+}
