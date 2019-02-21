@@ -56,16 +56,27 @@ $ cat >subprojects/mutest.wrap <<HERE
 
 And using the `fallback` option in your Meson build:
 
-```
+```meson
 mutest_dep = dependency('mutest-1', fallback: [ 'mutest', 'mutest_dep' ])
 ```
 
 The sub-project route is strongly encouraged.
 
+Once you added the dependency, use:
+
+```cpp
+#include <mutest.h>
+```
+
+In your test sources to use the µTest API.
+
 ### Getting started
 
 The µTest API is heavily influenced by frameworks such as [Mocha][mocha]
 and [Jasmine][jasmine].
+
+[mocha]: https://mochajs.org/
+[jasmine]: https://jasmine.github.io/
 
 You start from a *suite*, by calling `mutest_describe()` with a string
 containing the description of the suite, and a function pointer:
