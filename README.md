@@ -124,7 +124,8 @@ call_hello_world (mutest_spec_t *spec)
 }
 ```
 
-Building the test case and running it will generate the following result:
+Building the test case and running it will generate the following result
+with the default formatter:
 
 ```sh
 $ ./hello
@@ -134,14 +135,32 @@ $ ./hello
       ✓ Returns 'hello, world'
       ✓ Contains all components
       ✓ Does not contain 'goodbye'
+      - Should be skipped
 
     3 passing (2 ms)
+    1 skipped
     0 failing
 
   Total
   3 passing (3 ms)
+  1 skipped
   0 failing
 
+```
+
+If you have a [TAP](https://testanything.org/) harness already in place, you
+should use the TAP formatted, by exporting the `MUTEST_OUTPUT=tap` variable
+in your test environment:
+
+```sh
+$ MUTEST_OUTPUT=tap ./hello
+# Hello World
+# hello_world()
+ok - Returns 'hello, world'
+ok - Contains all components
+ok - Does not contain 'goodbye'
+ok # skip: Should be skipped
+1..4
 ```
 
 ## License
