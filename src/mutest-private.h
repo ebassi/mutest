@@ -300,6 +300,11 @@ mutest_expect_res_collect_value (mutest_expect_type_t type,
                                  va_list args);
 
 void
+mutest_expect_res_to_string (mutest_expect_res_t *res,
+                             char *buf,
+                             size_t len);
+
+void
 mutest_spec_add_result (mutest_spec_t *spec,
                         mutest_expect_t *expect);
 

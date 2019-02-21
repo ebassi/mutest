@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 void
 mutest_expect_res_free (mutest_expect_res_t *res)
@@ -36,6 +37,57 @@ mutest_expect_res_free (mutest_expect_res_t *res)
     }
 
   free (res);
+}
+
+void
+mutest_expect_res_to_string (mutest_expect_res_t *res,
+                             char *buf,
+                             size_t len)
+{
+  switch (res->expect_type)
+    {
+    case MUTEST_EXPECT_INVALID:
+      snprintf (buf, len, "invalid");
+      break;
+
+    case MUTEST_EXPECT_BOOL:
+      snprintf (buf, len, "%s", res->expect.v_bool ? "true" : "false");
+      break;
+
+    case MUTEST_EXPECT_INT:
+      snprintf (buf, len, "%d", res->expect.v_int);
+      break;
+
+    case MUTEST_EXPECT_INT_RANGE:
+      snprintf (buf, len, "[ %d, %d ]",
+                res->expect.v_irange.min,
+                res->expect.v_irange.max);
+      break;
+
+    case MUTEST_EXPECT_FLOAT:
+      snprintf (buf, len, "%g (± %g)",
+                res->expect.v_float.value,
+                res->expect.v_float.tolerance);
+      break;
+
+    case MUTEST_EXPECT_FLOAT_RANGE:
+      snprintf (buf, len, "[ %g, %g ]",
+                res->expect.v_frange.min,
+                res->expect.v_frange.max);
+      break;
+
+    case MUTEST_EXPECT_POINTER:
+      snprintf (buf, len, "%p", res->expect.v_pointer);
+      break;
+
+    case MUTEST_EXPECT_STR:
+      snprintf (buf, len, "%s", res->expect.v_str.str);
+      break;
+
+    case MUTEST_EXPECT_CLOSURE:
+    case MUTEST_EXPECT_BYTE_ARRAY:
+      break;
+    }
 }
 
 mutest_expect_res_t *
