@@ -263,23 +263,29 @@ mocha_total_results (mutest_state_t *state)
 static void
 tap_expect_result (mutest_expect_t *expect)
 {
+  mutest_state_t *state = mutest_get_global_state ();
+
+  char num[32];
+
+  snprintf (num, 32, "%d", state->n_tests);
+
   switch (expect->result)
     {
     case MUTEST_RESULT_PASS:
       mutest_print (STDOUT_FILENO,
-                    "ok - ", expect->description,
+                    "ok ", num, " ", expect->description,
                     NULL);
       break;
 
     case MUTEST_RESULT_FAIL:
       mutest_print (STDOUT_FILENO,
-                    "not ok - ", expect->description,
+                    "not ok ", num, " ", expect->description,
                     NULL);
       break;
 
     case MUTEST_RESULT_SKIP:
       mutest_print (STDOUT_FILENO,
-                    "ok # skip: ", expect->description,
+                    "ok ", num, " # skip: ", expect->description,
                     NULL);
       break;
     }
