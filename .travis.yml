@@ -14,13 +14,13 @@ language:
   - c
 
 before_install:
-  - docker pull ebassi/mutestci
+  - docker pull ebassi/mutestci:latest
 
 before_script:
   - echo FROM ebassi/mutestci > Dockerfile
-  - echo ADD . /root >> Dockerfile
-  - echo WORKDIR /root >> Dockerfile
-  - docker build -f Dockerfile -t withgit .
+  - echo ADD . /home/user/app >> Dockerfile
+  - echo WORKDIR /home/user/app >> Dockerfile
+  - docker build -t withgit .
 
 script:
   - docker run withgit /bin/sh -c "CC=$CC sh -x .travis-ci/run-tests.sh"

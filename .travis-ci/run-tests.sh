@@ -2,16 +2,13 @@
 
 set -x
 
-builddir=$( mktemp -d build_XXXXXX )
-srcdir=$( pwd )
+meson --prefix /usr "$@" _build . || exit $?
 
-meson --prefix /usr "$@" "${builddir}" "${srcdir}" || exit $?
-
-cd ${builddir}
+cd _build
 
 ninja || exit $?
 meson test || exit $?
 
 cd ..
 
-rm -rf ${builddir}
+rm -rf _build
