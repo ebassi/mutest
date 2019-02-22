@@ -1,5 +1,6 @@
 tests = [
   'general',
+  'types',
 ]
 
 foreach t: tests
