@@ -82,8 +82,8 @@ mutest_to_be_in_int_range (mutest_expect_t *e,
   if (e->value->expect_type == MUTEST_EXPECT_INT &&
       check->expect_type == MUTEST_EXPECT_INT_RANGE)
     {
-      if (check->expect.v_irange.min >= e->value->expect.v_int &&
-          check->expect.v_irange.max <= e->value->expect.v_int)
+      if (e->value->expect.v_int >= check->expect.v_irange.min &&
+          e->value->expect.v_int <= check->expect.v_irange.max)
         return true;
     }
 
