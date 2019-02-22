@@ -16,64 +16,6 @@
 
 MUTEST_BEGIN_DECLS
 
-typedef struct _mutest_list_t   mutest_list_t;
-
-struct _mutest_list_t {
-  mutest_list_t *next, *prev;
-  // back pointer, because we cannot portable use container_of()
-  void *data;
-};
-
-#define MUTEST_LIST_INIT(name)  { .next = &(name), .prev = &(name) }
-
-static inline void
-mutest_list_init (mutest_list_t *head,
-                  void *data)
-{
-  head->next = head;
-  head->prev = head;
-  head->data = data;
-}
-
-static inline void
-mutest_list_add (mutest_list_t *item,
-                 mutest_list_t *prev,
-                 mutest_list_t *next)
-{
-  next->prev = item;
-  item->next = next;
-  item->prev = prev;
-  prev->next = item;
-}
-
-static inline void
-mutest_list_prepend (mutest_list_t *item,
-                     mutest_list_t *head)
-{
-  mutest_list_add (item, head, head->next);
-}
-
-static inline void
-mutest_list_append (mutest_list_t *item,
-                    mutest_list_t *head)
-{
-  mutest_list_add (item, head->prev, head);
-}
-
-static inline bool
-mutest_list_is_empty (mutest_list_t *head)
-{
-  return head->next == head;
-}
-
-#define mutest_list_foreach(iter_name, head) \
-  for (mutest_list_t *iter_name = (head)->next; \
-       iter_name != head; \
-       iter_name = iter_name->next)
-
-#define mutest_list_entry(ptr, type) \
-  (type *) ((ptr)->data)
-
 typedef enum {
   MUTEST_OUTPUT_MOCHA,
   MUTEST_OUTPUT_TAP
