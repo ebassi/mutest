@@ -1,7 +1,7 @@
 #include <mutest.h>
 
 static void
-general_spec (mutest_spec_t *spec)
+general_spec (mutest_spec_t *spec MUTEST_UNUSED)
 {
   bool a = true;
 
@@ -16,7 +16,7 @@ general_spec (mutest_spec_t *spec)
 }
 
 static void
-another_spec (mutest_spec_t *spec)
+another_spec (mutest_spec_t *spec MUTEST_UNUSED)
 {
   const char *str = "hello, world";
 
@@ -37,7 +37,7 @@ another_spec (mutest_spec_t *spec)
 }
 
 static void
-skip_spec (mutest_spec_t *spec)
+skip_spec (mutest_spec_t *spec MUTEST_UNUSED)
 {
   mutest_expect ("skip this test",
                  mutest_bool_value (true),
@@ -46,7 +46,7 @@ skip_spec (mutest_spec_t *spec)
 }
 
 static void
-general_suite (mutest_suite_t *suite)
+general_suite (mutest_suite_t *suite MUTEST_UNUSED)
 {
   mutest_it ("contains at least a spec with an expectation", general_spec);
   mutest_it ("can contain multiple specs", another_spec);
