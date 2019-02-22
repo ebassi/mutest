@@ -360,6 +360,75 @@ mutest_print_expect (mutest_expect_t *expect)
 }
 
 void
+mutest_print_expect_fail (mutest_expect_t *expect,
+                          bool negate,
+                          mutest_expect_res_t *check)
+{
+  mutest_output_format_t format = mutest_get_output_format ();
+
+  if (format != MUTEST_OUTPUT_MOCHA)
+    return;
+
+  char location[256];
+  snprintf (location, 256, "%s (%s:%d)",
+            expect->func_name,
+            expect->file,
+            expect->line);
+
+  char lhs[256], rhs[256], comparison[16];
+
+  mutest_expect_res_to_string (expect->value, lhs, 256);
+  mutest_expect_res_to_string (check, rhs, 256);
+
+  switch (check->expect_type)
+    {
+    case MUTEST_EXPECT_INVALID:
+      snprintf (comparison, 16, " ? ");
+      break;
+
+    case MUTEST_EXPECT_BOOL:
+    case MUTEST_EXPECT_INT:
+    case MUTEST_EXPECT_STR:
+    case MUTEST_EXPECT_POINTER:
+      snprintf (comparison, 16, " %s ", negate ? " ≢ " : " ≡ ");
+      break;
+
+    case MUTEST_EXPECT_FLOAT:
+      snprintf (comparison, 16, " %s ", negate ? " ≉ " : " ≈ ");
+      break;
+
+    case MUTEST_EXPECT_INT_RANGE:
+    case MUTEST_EXPECT_FLOAT_RANGE:
+      snprintf (comparison, 16, " %s ", negate ? " ∉ " : " ∈ ");
+      break;
+
+    case MUTEST_EXPECT_BYTE_ARRAY:
+    case MUTEST_EXPECT_CLOSURE:
+      comparison[0] = '\000';
+      break;
+    }
+
+  if (mutest_use_colors ())
+    {
+      mutest_print (STDOUT_FILENO,
+                    "      ",
+                    MUTEST_COLOR_RED, "Assertion failure: ",
+                    lhs, comparison, rhs,
+                    " at ", location, MUTEST_COLOR_NONE,
+                    NULL);
+    }
+  else
+    {
+      mutest_print (STDOUT_FILENO,
+                    "      ",
+                    "Assertion failure: ",
+                    lhs, " ", comparison, " ", rhs,
+                    " at ", location,
+                    NULL);
+    }
+}
+
+void
 mutest_print_spec_preamble (mutest_spec_t *spec)
 {
   mutest_output_format_t format = mutest_get_output_format ();

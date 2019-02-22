@@ -309,4 +309,9 @@ mutest_print_spec_totals (mutest_spec_t *spec);
 void
 mutest_print_expect (mutest_expect_t *expect);
 
+void
+mutest_print_expect_fail (mutest_expect_t *expect,
+                          bool negate,
+                          mutest_expect_res_t *check);
+
 MUTEST_END_DECLS

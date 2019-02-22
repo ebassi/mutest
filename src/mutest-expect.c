@@ -68,6 +68,7 @@ mutest_expect_full (const char *file,
     .file = file,
     .line = line,
     .func_name = func_name,
+    .result = MUTEST_RESULT_PASS,
   };
 
   va_list args;
@@ -103,9 +104,12 @@ mutest_expect_full (const char *file,
 
       bool res = expect_func (&e, check);
 
-      if (negate)
-        e.result = res ? MUTEST_RESULT_FAIL : MUTEST_RESULT_PASS;
-      else
+      res = negate ? !res : res;
+
+      if (!res)
+        mutest_print_expect_fail (&e, negate, check);
+
+      if (e.result == MUTEST_RESULT_PASS)
         e.result = res ? MUTEST_RESULT_PASS : MUTEST_RESULT_FAIL;
 
       mutest_expect_res_free (check);
