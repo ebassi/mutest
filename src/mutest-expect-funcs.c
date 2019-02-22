@@ -95,12 +95,7 @@ near_equal (double a,
             double b,
             double epsilon)
 {
-  const double diff = fabs (a - b);
-  const double abs_a = fabs (a);
-  const double abs_b = fabs (b);
-  const double scaled_epsilon = epsilon * (abs_a > abs_b ? abs_a : abs_b);
-
-  return diff <= scaled_epsilon;
+  return (a > b ? (a - b) : (b - a)) <= epsilon;
 }
 
 bool
