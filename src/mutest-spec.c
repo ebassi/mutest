@@ -1,3 +1,10 @@
+/* mutest-spec.c: Specifications
+ *
+ * µTest - Copyright 2019  Emmanuele Bassi
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "config.h"
 
 #include "mutest-private.h"

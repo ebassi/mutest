@@ -1,3 +1,10 @@
+/* mutest-expect-types.c: Result types
+ *
+ * µTest - Copyright 2019  Emmanuele Bassi
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "config.h"
 
 #include "mutest-private.h"

@@ -1,3 +1,10 @@
+/* mutest-main.c: Global state
+ *
+ * µTest - Copyright 2019  Emmanuele Bassi
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "config.h"
 
 #include "mutest-private.h"
