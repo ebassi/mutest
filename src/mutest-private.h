@@ -217,20 +217,6 @@ struct _mutest_suite_t
 #define mutest_assert(x) \
   mutest_assert_message (__FILE__, __LINE__, __func__, #x)
 
-#ifdef __GNUC__
-# define MUTEST_NO_RETURN \
-  __attribute__((__noreturn__))
-#else
-# define MUTEST_NO_RETURN
-#endif
-
-#ifdef __GNUC__
-# define MUTEST_UNUSED \
-  __attribute__((unused))
-#else
-# define MUTEST_UNUSED
-#endif
-
 #if defined(__GNUC__) && __GNUC__ > 3
 # define mutest_likely(x)       (__builtin_expect((x) ? 1 : 0, 1))
 # define mutest_unlikely(x)     (__builtin_expect((x) ? 1 : 0, 0))

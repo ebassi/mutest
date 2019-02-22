@@ -265,6 +265,7 @@ mutest_pointer (void *pointer)
   return res;
 }
 
+#if 0
 mutest_expect_res_t *
 mutest_byte_array (void *data,
                    size_t element_size,
@@ -312,3 +313,4 @@ mutest_closure (mutest_expect_closure_func_t func,
 
   return res;
 }
+#endif
