@@ -401,14 +401,14 @@ mutest_print_expect_fail (mutest_expect_t *expect,
         case MUTEST_EXPECT_STR:
         case MUTEST_EXPECT_POINTER:
         case MUTEST_EXPECT_POINTER_NULL:
-          snprintf (comparison, 16, " %s ", negate ? " ≢ " : " ≡ ");
+          snprintf (comparison, 16, " %s ", negate ? "≢" : "≡");
           break;
         case MUTEST_EXPECT_FLOAT:
-          snprintf (comparison, 16, " %s ", negate ? " ≉ " : " ≈ ");
+          snprintf (comparison, 16, " %s ", negate ? "≉" : "≈");
           break;
         case MUTEST_EXPECT_INT_RANGE:
         case MUTEST_EXPECT_FLOAT_RANGE:
-          snprintf (comparison, 16, " %s ", negate ? " ∉ " : " ∈ ");
+          snprintf (comparison, 16, " %s ", negate ? "∉" : "∈");
           break;
         case MUTEST_EXPECT_BYTE_ARRAY:
         case MUTEST_EXPECT_CLOSURE:
