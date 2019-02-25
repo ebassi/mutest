@@ -385,34 +385,39 @@ mutest_print_expect_fail (mutest_expect_t *expect,
   char lhs[256], rhs[256], comparison[16];
 
   mutest_expect_res_to_string (expect->value, lhs, 256);
-  mutest_expect_res_to_string (check, rhs, 256);
 
-  switch (check->expect_type)
+  if (check != NULL)
     {
-    case MUTEST_EXPECT_INVALID:
-      snprintf (comparison, 16, " ? ");
-      break;
+      mutest_expect_res_to_string (check, rhs, 256);
 
-    case MUTEST_EXPECT_BOOL:
-    case MUTEST_EXPECT_INT:
-    case MUTEST_EXPECT_STR:
-    case MUTEST_EXPECT_POINTER:
-      snprintf (comparison, 16, " %s ", negate ? " ≢ " : " ≡ ");
-      break;
-
-    case MUTEST_EXPECT_FLOAT:
-      snprintf (comparison, 16, " %s ", negate ? " ≉ " : " ≈ ");
-      break;
-
-    case MUTEST_EXPECT_INT_RANGE:
-    case MUTEST_EXPECT_FLOAT_RANGE:
-      snprintf (comparison, 16, " %s ", negate ? " ∉ " : " ∈ ");
-      break;
-
-    case MUTEST_EXPECT_BYTE_ARRAY:
-    case MUTEST_EXPECT_CLOSURE:
-      comparison[0] = '\000';
-      break;
+      switch (check->expect_type)
+        {
+        case MUTEST_EXPECT_INVALID:
+          snprintf (comparison, 16, " ? ");
+          break;
+        case MUTEST_EXPECT_BOOL:
+        case MUTEST_EXPECT_INT:
+        case MUTEST_EXPECT_STR:
+        case MUTEST_EXPECT_POINTER:
+          snprintf (comparison, 16, " %s ", negate ? " ≢ " : " ≡ ");
+          break;
+        case MUTEST_EXPECT_FLOAT:
+          snprintf (comparison, 16, " %s ", negate ? " ≉ " : " ≈ ");
+          break;
+        case MUTEST_EXPECT_INT_RANGE:
+        case MUTEST_EXPECT_FLOAT_RANGE:
+          snprintf (comparison, 16, " %s ", negate ? " ∉ " : " ∈ ");
+          break;
+        case MUTEST_EXPECT_BYTE_ARRAY:
+        case MUTEST_EXPECT_CLOSURE:
+          comparison[0] = '\000';
+          break;
+        }
+    }
+  else
+    {
+      rhs[0] = '\0';
+      comparison[0] = '\0';
     }
 
   if (mutest_use_colors ())

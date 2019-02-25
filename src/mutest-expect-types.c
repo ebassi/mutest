@@ -51,6 +51,9 @@ mutest_expect_res_to_string (mutest_expect_res_t *res,
                              char *buf,
                              size_t len)
 {
+  if (res == NULL)
+    return;
+
   switch (res->expect_type)
     {
     case MUTEST_EXPECT_INVALID:
