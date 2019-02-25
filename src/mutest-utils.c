@@ -42,7 +42,7 @@ mutest_get_current_time (void)
 
   res = clock_gettime (CLOCK_MONOTONIC, &ts);
 
-  if (res == 0)
+  if (res != 0)
     return 0;
 
   return (((int64_t) ts.tv_sec) * 1000000) + (ts.tv_nsec / 1000);
