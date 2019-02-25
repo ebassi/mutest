@@ -32,7 +32,7 @@ bool
 mutest_to_be_true (mutest_expect_t *e,
                    mutest_expect_res_t *check MUTEST_UNUSED)
 {
-  if (e->value->expect_type == MUTEST_EXPECT_BOOL)
+  if (e->value->expect_type == MUTEST_EXPECT_BOOL_TRUE)
     return e->value->expect.v_bool;
 
   if (e->value->expect_type == MUTEST_EXPECT_INT)
@@ -45,7 +45,7 @@ bool
 mutest_to_be_false (mutest_expect_t *e,
                     mutest_expect_res_t *check MUTEST_UNUSED)
 {
-  if (e->value->expect_type == MUTEST_EXPECT_BOOL)
+  if (e->value->expect_type == MUTEST_EXPECT_BOOL_FALSE)
     return !e->value->expect.v_bool;
 
   if (e->value->expect_type == MUTEST_EXPECT_INT)
@@ -58,7 +58,8 @@ bool
 mutest_to_be_null (mutest_expect_t *e,
                    mutest_expect_res_t *check MUTEST_UNUSED)
 {
-  if (e->value->expect_type == MUTEST_EXPECT_POINTER)
+  if (e->value->expect_type == MUTEST_EXPECT_POINTER ||
+      e->value->expect_type == MUTEST_EXPECT_POINTER_NULL)
     return e->value->expect.v_pointer == NULL;
 
   return false;

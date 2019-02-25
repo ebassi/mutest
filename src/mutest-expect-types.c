@@ -13,6 +13,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <float.h>
 
 void
 mutest_expect_res_free (mutest_expect_res_t *res)
@@ -26,12 +27,14 @@ mutest_expect_res_free (mutest_expect_res_t *res)
       mutest_assert_if_reached ("invalid value");
       break;
 
-    case MUTEST_EXPECT_BOOL:
+    case MUTEST_EXPECT_BOOL_TRUE:
+    case MUTEST_EXPECT_BOOL_FALSE:
     case MUTEST_EXPECT_INT:
     case MUTEST_EXPECT_INT_RANGE:
     case MUTEST_EXPECT_FLOAT:
     case MUTEST_EXPECT_FLOAT_RANGE:
     case MUTEST_EXPECT_POINTER:
+    case MUTEST_EXPECT_POINTER_NULL:
     case MUTEST_EXPECT_CLOSURE:
       break;
 
@@ -60,7 +63,8 @@ mutest_expect_res_to_string (mutest_expect_res_t *res,
       snprintf (buf, len, "invalid");
       break;
 
-    case MUTEST_EXPECT_BOOL:
+    case MUTEST_EXPECT_BOOL_TRUE:
+    case MUTEST_EXPECT_BOOL_FALSE:
       snprintf (buf, len, "%s", res->expect.v_bool ? "true" : "false");
       break;
 
@@ -90,6 +94,10 @@ mutest_expect_res_to_string (mutest_expect_res_t *res,
       snprintf (buf, len, "%p", res->expect.v_pointer);
       break;
 
+    case MUTEST_EXPECT_POINTER_NULL:
+      snprintf (buf, len, "%s", "null");
+      break;
+
     case MUTEST_EXPECT_STR:
       snprintf (buf, len, "%s", res->expect.v_str.str);
       break;
@@ -117,7 +125,9 @@ mutest_expect_res_collect_value (mutest_expect_type_t type,
       mutest_assert_if_reached ("invalid value");
       break;
 
-    case MUTEST_EXPECT_BOOL:
+    case MUTEST_EXPECT_BOOL_TRUE:
+    case MUTEST_EXPECT_BOOL_FALSE:
+      retval->expect.v_bool = va_arg (args, int);
       break;
 
     case MUTEST_EXPECT_INT:
@@ -161,8 +171,74 @@ mutest_expect_res_collect_value (mutest_expect_type_t type,
       retval->expect.v_str.len = strlen (retval->expect.v_str.str);
       break;
 
+    case MUTEST_EXPECT_POINTER_NULL:
+      retval->expect.v_pointer = NULL;
+      break;
+
     case MUTEST_EXPECT_POINTER:
       retval->expect.v_pointer = va_arg (args, void *);
+      break;
+
+    case MUTEST_EXPECT_BYTE_ARRAY:
+    case MUTEST_EXPECT_CLOSURE:
+      mutest_assert_if_reached ("not implemented");
+      break;
+    }
+
+  return retval;
+}
+
+mutest_expect_res_t *
+mutest_expect_res_default_value (mutest_expect_type_t type)
+{
+  mutest_expect_res_t *retval = malloc (sizeof (mutest_expect_res_t));
+
+  if (retval == NULL)
+    mutest_oom_abort ();
+
+  retval->expect_type = type;
+
+  switch (retval->expect_type)
+    {
+    case MUTEST_EXPECT_INVALID:
+      mutest_assert_if_reached ("invalid value");
+      break;
+
+    case MUTEST_EXPECT_BOOL_TRUE:
+      retval->expect.v_bool = false;
+      break;
+
+    case MUTEST_EXPECT_BOOL_FALSE:
+      retval->expect.v_bool = false;
+      break;
+
+    case MUTEST_EXPECT_INT:
+      retval->expect.v_int = 0;
+      break;
+
+    case MUTEST_EXPECT_INT_RANGE:
+      retval->expect.v_irange.min = 0;
+      retval->expect.v_irange.max = 0;
+      break;
+
+    case MUTEST_EXPECT_FLOAT:
+      retval->expect.v_float.value = 0;
+      retval->expect.v_float.tolerance = DBL_EPSILON;
+      break;
+
+    case MUTEST_EXPECT_FLOAT_RANGE:
+      retval->expect.v_frange.min = 0;
+      retval->expect.v_frange.max = 0;
+      break;
+
+    case MUTEST_EXPECT_STR:
+      retval->expect.v_str.str = NULL;
+      retval->expect.v_str.len = 0;
+      break;
+
+    case MUTEST_EXPECT_POINTER:
+    case MUTEST_EXPECT_POINTER_NULL:
+      retval->expect.v_pointer = NULL;
       break;
 
     case MUTEST_EXPECT_BYTE_ARRAY:
@@ -181,7 +257,7 @@ mutest_bool_value (bool value)
   if (res == NULL)
     mutest_oom_abort ();
 
-  res->expect_type = MUTEST_EXPECT_BOOL;
+  res->expect_type = value ? MUTEST_EXPECT_BOOL_TRUE : MUTEST_EXPECT_BOOL_FALSE;
   res->expect.v_bool = value;
 
   return res;
@@ -269,7 +345,7 @@ mutest_pointer (void *pointer)
   if (res == NULL)
     mutest_oom_abort ();
 
-  res->expect_type = MUTEST_EXPECT_POINTER;
+  res->expect_type = pointer == NULL ? MUTEST_EXPECT_POINTER_NULL : MUTEST_EXPECT_POINTER;
   res->expect.v_pointer = pointer;
 
   return res;

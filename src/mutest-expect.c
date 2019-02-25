@@ -27,9 +27,9 @@ static const struct {
   bool collect_value;
   mutest_expect_type_t collect_type;
 } collectors[] = {
-  EXPECT_FUNC (mutest_to_be_true, false, MUTEST_EXPECT_BOOL),
-  EXPECT_FUNC (mutest_to_be_false, false, MUTEST_EXPECT_BOOL),
-  EXPECT_FUNC (mutest_to_be_null, false, MUTEST_EXPECT_POINTER),
+  EXPECT_FUNC (mutest_to_be_true, false, MUTEST_EXPECT_BOOL_TRUE),
+  EXPECT_FUNC (mutest_to_be_false, false, MUTEST_EXPECT_BOOL_FALSE),
+  EXPECT_FUNC (mutest_to_be_null, false, MUTEST_EXPECT_POINTER_NULL),
   EXPECT_FUNC (mutest_to_be_int_value, true, MUTEST_EXPECT_INT),
   EXPECT_FUNC (mutest_to_be_in_int_range, true, MUTEST_EXPECT_INT_RANGE),
   EXPECT_FUNC (mutest_to_be_float_value, true, MUTEST_EXPECT_FLOAT),
@@ -99,7 +99,7 @@ mutest_expect_full (const char *file,
               if (collectors[i].collect_value)
                 check = mutest_expect_res_collect_value (collectors[i].collect_type, args);
               else
-                check = NULL;
+                check = mutest_expect_res_default_value (collectors[i].collect_type);
 
               break;
             }

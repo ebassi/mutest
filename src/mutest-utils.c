@@ -395,10 +395,12 @@ mutest_print_expect_fail (mutest_expect_t *expect,
         case MUTEST_EXPECT_INVALID:
           snprintf (comparison, 16, " ? ");
           break;
-        case MUTEST_EXPECT_BOOL:
+        case MUTEST_EXPECT_BOOL_TRUE:
+        case MUTEST_EXPECT_BOOL_FALSE:
         case MUTEST_EXPECT_INT:
         case MUTEST_EXPECT_STR:
         case MUTEST_EXPECT_POINTER:
+        case MUTEST_EXPECT_POINTER_NULL:
           snprintf (comparison, 16, " %s ", negate ? " ≢ " : " ≡ ");
           break;
         case MUTEST_EXPECT_FLOAT:

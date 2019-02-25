@@ -53,13 +53,15 @@ typedef enum {
 typedef enum {
   MUTEST_EXPECT_INVALID,
 
-  MUTEST_EXPECT_BOOL,
+  MUTEST_EXPECT_BOOL_TRUE,
+  MUTEST_EXPECT_BOOL_FALSE,
   MUTEST_EXPECT_INT,
   MUTEST_EXPECT_INT_RANGE,
   MUTEST_EXPECT_FLOAT,
   MUTEST_EXPECT_FLOAT_RANGE,
   MUTEST_EXPECT_STR,
   MUTEST_EXPECT_POINTER,
+  MUTEST_EXPECT_POINTER_NULL,
   MUTEST_EXPECT_BYTE_ARRAY,
   MUTEST_EXPECT_CLOSURE,
 } mutest_expect_type_t;
@@ -226,6 +228,9 @@ mutest_add_skip (void);
 mutest_expect_res_t *
 mutest_expect_res_collect_value (mutest_expect_type_t type,
                                  va_list args);
+
+mutest_expect_res_t *
+mutest_expect_res_default_value (mutest_expect_type_t type);
 
 void
 mutest_expect_res_to_string (mutest_expect_res_t *res,
