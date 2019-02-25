@@ -206,7 +206,7 @@ mocha_spec_results (mutest_spec_t *spec)
   char delta_s[128];
 
   delta_t = format_time (spec->end_time - spec->start_time, &delta_u);
-  snprintf (delta_s, 128, "(%.2g %s)", delta_t, delta_u);
+  snprintf (delta_s, 128, "(%.2f %s)", delta_t, delta_u);
 
   if (mutest_use_colors ())
     mutest_print (STDOUT_FILENO,
@@ -242,7 +242,7 @@ mocha_total_results (mutest_state_t *state)
   char delta_s[128];
 
   delta_t = format_time (state->end_time - state->start_time, &delta_u);
-  snprintf (delta_s, 128, "(%.2g %s)", delta_t, delta_u);
+  snprintf (delta_s, 128, "(%.2f %s)", delta_t, delta_u);
 
   if (mutest_use_colors ())
     mutest_print (STDOUT_FILENO,
