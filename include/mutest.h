@@ -155,7 +155,6 @@ mutest_string_value (const char *value);
 /**
  * mutest_float_value:
  * @value: a floating point scalar
- * @tolerance: the tolerance for the check
  *
  * Wraps a floating point value to pass to mutest_expect().
  *
@@ -163,8 +162,7 @@ mutest_string_value (const char *value);
  */
 MUTEST_PUBLIC
 mutest_expect_res_t *
-mutest_float_value (double value,
-                    double tolerance);
+mutest_float_value (double value);
 
 /**
  * mutest_int_range:

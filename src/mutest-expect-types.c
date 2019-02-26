@@ -294,8 +294,7 @@ mutest_string_value (const char *value)
 }
 
 mutest_expect_res_t *
-mutest_float_value (double value,
-                    double tolerance)
+mutest_float_value (double value)
 {
   mutest_expect_res_t *res = malloc (sizeof (mutest_expect_res_t));
   if (res == NULL)
@@ -303,7 +302,7 @@ mutest_float_value (double value,
 
   res->expect_type = MUTEST_EXPECT_FLOAT;
   res->expect.v_float.value = value;
-  res->expect.v_float.tolerance = tolerance;
+  res->expect.v_float.tolerance = DBL_EPSILON;
 
   return res;
 }

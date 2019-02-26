@@ -14,7 +14,7 @@ check_scalars (mutest_spec_t *spec MUTEST_UNUSED)
                  mutest_not, mutest_to_be_int_value, 47,
                  NULL);
   mutest_expect ("float values",
-                 mutest_float_value (3.1416, 0.1),
+                 mutest_float_value (3.1416),
                  mutest_to_be_float_value, 3.1415, 0.0001,
                  mutest_not, mutest_to_be_float_value, 3.14159, 0.00001,
                  NULL);
@@ -37,7 +37,7 @@ check_ranges (mutest_spec_t *spec MUTEST_UNUSED)
                  mutest_not, mutest_to_be_in_int_range, 43, 50,
                  NULL);
   mutest_expect ("float range",
-                 mutest_float_value (3.14, 0.01),
+                 mutest_float_value (3.14),
                  mutest_to_be_in_float_range, 3.0, 4.0,
                  NULL);
 }
