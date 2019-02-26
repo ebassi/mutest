@@ -105,6 +105,12 @@ mutest_expect_full (const char *file,
             }
         }
 
+      /* If we're using a custom expectation function then we collect
+       * the value as a pointer instead of unpacking raw arguments
+       */
+      if (check == NULL)
+        check = va_arg (args, mutest_expect_res_t *);
+
       bool res = expect_func (&e, check);
 
       res = negate ? !res : res;
