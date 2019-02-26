@@ -71,9 +71,43 @@ mutest_describe_full (const char *file,
 
   mutest_set_current_suite (&suite);
 
+  mutest_state_t *state = mutest_get_global_state ();
+
+  if (state->before_hook != NULL)
+    state->before_hook ();
+
   mutest_print_suite_preamble (&suite);
+
+  suite.start_time = mutest_get_current_time ();
 
   func (&suite);
 
+  suite.end_time = mutest_get_current_time ();
+
+  if (state->after_hook != NULL)
+    state->after_hook ();
+
   mutest_set_current_suite (NULL);
+}
+
+void
+mutest_before_each (mutest_hook_func_t hook)
+{
+  mutest_suite_t *suite = mutest_get_current_suite ();
+
+  if (suite == NULL)
+    mutest_assert_if_reached ("no suite defined");
+
+  suite->before_each_hook = hook;
+}
+
+void
+mutest_after_each (mutest_hook_func_t hook)
+{
+  mutest_suite_t *suite = mutest_get_current_suite ();
+
+  if (suite == NULL)
+    mutest_assert_if_reached ("no suite defined");
+
+  suite->after_each_hook = hook;
 }

@@ -42,6 +42,9 @@ typedef struct {
   int64_t end_time;
 
   mutest_output_format_t output_format;
+
+  mutest_hook_func_t before_hook;
+  mutest_hook_func_t after_hook;
 } mutest_state_t;
 
 typedef enum {
@@ -150,6 +153,9 @@ struct _mutest_suite_t
 
   int64_t start_time;
   int64_t end_time;
+
+  mutest_hook_func_t before_each_hook;
+  mutest_hook_func_t after_each_hook;
 };
 
 #define mutest_oom_abort() \
@@ -252,6 +258,9 @@ mutest_print_spec_preamble (mutest_spec_t *suite);
 
 void
 mutest_print_spec_totals (mutest_spec_t *spec);
+
+void
+mutest_print_suite_totals (mutest_suite_t *suite);
 
 void
 mutest_print_expect (mutest_expect_t *expect);

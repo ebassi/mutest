@@ -34,18 +34,27 @@ mutest_it_full (const char *file,
     .file = file,
     .line = line,
     .func_name = func_name,
-    .start_time = mutest_get_current_time (),
   };
 
   mutest_print_spec_preamble (&spec);
 
   mutest_set_current_spec (&spec);
 
+  mutest_suite_t *suite = mutest_get_current_suite ();
+
+  if (suite->before_each_hook != NULL)
+    suite->before_each_hook ();
+
+  spec.start_time = mutest_get_current_time (),
+
   func (&spec);
 
-  mutest_set_current_spec (NULL);
-
   spec.end_time = mutest_get_current_time ();
+
+  if (suite->after_each_hook != NULL)
+    suite->after_each_hook ();
+
+  mutest_set_current_spec (NULL);
 
   mutest_print_spec_totals (&spec);
 }

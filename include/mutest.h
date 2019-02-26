@@ -46,6 +46,8 @@
 
 MUTEST_BEGIN_DECLS
 
+/* {{{ Types */
+
 /**
  * mutest_suite_t:
  *
@@ -115,6 +117,18 @@ typedef bool (* mutest_expect_func_t) (mutest_expect_t *e,
 typedef bool (* mutest_expect_closure_func_t) (const mutest_expect_t *e,
                                                const mutest_expect_res_t *check,
                                                void *data);
+
+/**
+ * mutest_hook_func_t:
+ *
+ * The prototype of a function to pass to mutest_before(), mutest_before_each(),
+ * mutest_after_each(), and mutest_after().
+ */
+typedef void (* mutest_hook_func_t) (void);
+
+/* }}} */
+
+/* {{{ Value wrappers */
 
 /**
  * mutest_bool_value:
@@ -205,6 +219,10 @@ mutest_float_range (double min,
 MUTEST_PUBLIC
 mutest_expect_res_t *
 mutest_pointer (void *pointer);
+
+/* }}} */
+
+/* {{{ Matchers */
 
 /**
  * mutest_not:
@@ -412,6 +430,10 @@ bool
 mutest_to_end_with_string (mutest_expect_t *e,
                            mutest_expect_res_t *check);
 
+/* }}} */
+
+/* {{{ Main API */
+
 MUTEST_PUBLIC
 void
 mutest_expect_full (const char *file,
@@ -483,6 +505,146 @@ mutest_describe_full (const char *file,
 #define mutest_describe(description,func) \
   mutest_describe_full (__FILE__, __LINE__, __func__, description, func)
 
+/* }}} */
+
+/* {{{ Hooks */
+
+/**
+ * mutest_before:
+ * @hook: a #mutest_hook_func_t function
+ *
+ * Sets the function to be called once before a suite
+ * defined by mutest_describe().
+ *
+ * For instance:
+ *
+ * |[<!-- language="C" -->
+ * static void
+ * before_func (void)
+ * {
+ * }
+ *
+ * static void
+ * hooks_suite (mutest_suite_t *suite)
+ * {
+ *   // test cases
+ * }
+ *
+ * MUTEST_MAIN (
+ *   // runs once before all tests cases
+ *   mutest_before (before_func);
+ *
+ *   mutest_describe ("hooks", hooks_suite);
+ * )
+ * ]|
+ */
+MUTEST_PUBLIC
+void
+mutest_before (mutest_hook_func_t hook);
+
+/**
+ * mutest_after:
+ * @hook: a #mutest_hook_func_t function
+ *
+ * Sets the function to be called once after a suite
+ * defined by mutest_describe().
+ *
+ * For instance:
+ *
+ * |[<!-- language="C" -->
+ * static void
+ * after_func (void)
+ * {
+ * }
+ *
+ * static void
+ * hooks_suite (mutest_suite_t *suite)
+ * {
+ *   // test cases
+ * }
+ *
+ * MUTEST_MAIN (
+ *   // runs once after all tests cases
+ *   mutest_after (after_func);
+ *
+ *   mutest_describe ("hooks", hooks_suite);
+ * )
+ * ]|
+ */
+MUTEST_PUBLIC
+void
+mutest_after (mutest_hook_func_t hook);
+
+/**
+ * mutest_before_each:
+ * @hook: a #mutest_hook_func_t function
+ *
+ * Sets the function to be called before every specification
+ * defined by mutest_it().
+ *
+ * For instance:
+ *
+ * |[<!-- language="C" -->
+ * static void
+ * before_each_func (void)
+ * {
+ * }
+ *
+ * static void
+ * hooks_suite (mutest_suite_t *suite)
+ * {
+ *   // runs before each tests case
+ *   mutest_before_each (before_each_func);
+ *
+ *   // test cases
+ * }
+ *
+ * MUTEST_MAIN (
+ *   mutest_describe ("hooks", hooks_suite);
+ * )
+ * ]|
+ */
+MUTEST_PUBLIC
+void
+mutest_before_each (mutest_hook_func_t hook);
+
+/**
+ * mutest_after_each:
+ * @hook: a #mutest_hook_func_t function
+ *
+ * Sets the function to be called after each specification
+ * defined by mutest_it().
+ *
+ * For instance:
+ *
+ * |[<!-- language="C" -->
+ * static void
+ * after_each_func (void)
+ * {
+ * }
+ *
+ * static void
+ * hooks_suite (mutest_suite_t *suite)
+ * {
+ *   // runs after each tests case
+ *   mutest_after_each (after_each_func);
+ *
+ *   // test cases
+ * }
+ *
+ * MUTEST_MAIN (
+ *   mutest_describe ("hooks", hooks_suite);
+ * )
+ * ]|
+ */
+MUTEST_PUBLIC
+void
+mutest_after_each (mutest_hook_func_t hook);
+
+/* }}} */
+
+/* {{{ Entry points */
+
 /**
  * mutest_init:
  *
@@ -524,5 +686,7 @@ int main (int argc MUTEST_UNUSED, \
 \
   return mutest_report (); \
 }
+
+/* }}} */
 
 MUTEST_END_DECLS

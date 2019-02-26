@@ -229,6 +229,11 @@ mocha_spec_results (mutest_spec_t *spec)
 }
 
 static void
+mocha_suite_results (mutest_suite_t *state MUTEST_UNUSED)
+{
+}
+
+static void
 mocha_total_results (mutest_state_t *state)
 {
   char passing_s[128], failing_s[128], skipped_s[128];
@@ -330,6 +335,7 @@ static struct {
   void (* spec_preamble) (mutest_spec_t *spec);
   void (* expect_result) (mutest_expect_t *expect);
   void (* spec_results) (mutest_spec_t *spec);
+  void (* suite_results) (mutest_suite_t *suite);
   void (* total_results) (mutest_state_t *state);
 } output_formatters[] = {
   [MUTEST_OUTPUT_MOCHA] = {
@@ -337,6 +343,7 @@ static struct {
     .spec_preamble = mocha_spec_preamble,
     .expect_result = mocha_expect_result,
     .spec_results = mocha_spec_results,
+    .suite_results = mocha_suite_results,
     .total_results = mocha_total_results,
   },
   [MUTEST_OUTPUT_TAP] = {
@@ -344,6 +351,7 @@ static struct {
     .spec_preamble = tap_spec_preamble,
     .expect_result = tap_expect_result,
     .spec_results = NULL,
+    .suite_results = NULL,
     .total_results = tap_total_results,
   },
 };
@@ -458,6 +466,15 @@ mutest_print_spec_totals (mutest_spec_t *spec)
 
   if (output_formatters[format].spec_results != NULL)
     output_formatters[format].spec_results (spec);
+}
+
+void
+mutest_print_suite_totals (mutest_suite_t *suite)
+{
+  mutest_output_format_t format = mutest_get_output_format ();
+
+  if (output_formatters[format].suite_results != NULL)
+    output_formatters[format].suite_results (suite);
 }
 
 void

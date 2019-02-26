@@ -178,6 +178,18 @@ update_term_size (void)
 }
 
 void
+mutest_before (mutest_hook_func_t hook)
+{
+  global_state.before_hook = hook;
+}
+
+void
+mutest_after (mutest_hook_func_t hook)
+{
+  global_state.after_hook = hook;
+}
+
+void
 mutest_init (void)
 {
   if (mutest_likely (global_state.initialized))
