@@ -209,22 +209,34 @@ mocha_spec_results (mutest_spec_t *spec)
   snprintf (delta_s, 128, "(%.2f %s)", delta_t, delta_u);
 
   if (mutest_use_colors ())
-    mutest_print (STDOUT_FILENO,
-                  "\n",
-                  "    ",
-                  MUTEST_COLOR_GREEN, passing_s, MUTEST_COLOR_NONE, " ",
-                  MUTEST_COLOR_LIGHT_GREY, delta_s, MUTEST_COLOR_NONE, "\n",
-                  "    ",
-                  MUTEST_COLOR_YELLOW, skipped_s, MUTEST_COLOR_NONE, "\n",
-                  "    ",
-                  MUTEST_COLOR_RED, failing_s, MUTEST_COLOR_NONE, "\n",
-                  NULL);
+    {
+      mutest_print (STDOUT_FILENO,
+                    "\n",
+                    "      ",
+                    MUTEST_COLOR_GREEN, passing_s, MUTEST_COLOR_NONE, " ",
+                    MUTEST_COLOR_LIGHT_GREY, delta_s, MUTEST_COLOR_NONE,
+                    NULL);
+
+      if (spec->skip != 0)
+        mutest_print (STDOUT_FILENO,
+                      "      ",
+                      MUTEST_COLOR_YELLOW, skipped_s, MUTEST_COLOR_NONE,
+                      NULL);
+
+      if (spec->fail != 0)
+        mutest_print (STDOUT_FILENO,
+                      "      ",
+                      MUTEST_COLOR_RED, failing_s, MUTEST_COLOR_NONE,
+                      NULL);
+
+      mutest_print (STDOUT_FILENO, "", NULL);
+    }
   else
     mutest_print (STDOUT_FILENO,
                   "\n",
-                  "    ", passing_s, " ", delta_s, "\n",
-                  "    ", skipped_s, "\n",
-                  "    ", failing_s, "\n",
+                  "      ", passing_s, " ", delta_s, "\n",
+                  "      ", skipped_s, "\n",
+                  "      ", failing_s, "\n",
                   NULL);
 }
 
@@ -250,18 +262,26 @@ mocha_total_results (mutest_state_t *state)
   snprintf (delta_s, 128, "(%.2f %s)", delta_t, delta_u);
 
   if (mutest_use_colors ())
-    mutest_print (STDOUT_FILENO,
-                  "\n",
-                  "  ",
-                  MUTEST_UNDERLINE_DEFAULT, "Total", MUTEST_COLOR_NONE, "\n",
-                  "  ",
-                  MUTEST_COLOR_GREEN, passing_s, MUTEST_COLOR_NONE, " ",
-                  MUTEST_COLOR_LIGHT_GREY, delta_s, MUTEST_COLOR_NONE, "\n",
-                  "  ",
-                  MUTEST_COLOR_YELLOW, skipped_s, MUTEST_COLOR_NONE, "\n",
-                  "  ",
-                  MUTEST_COLOR_RED, failing_s, MUTEST_COLOR_NONE, "\n",
-                  NULL);
+    {
+      mutest_print (STDOUT_FILENO,
+                    "\n",
+                    MUTEST_UNDERLINE_DEFAULT, "Total", MUTEST_COLOR_NONE, "\n",
+                    MUTEST_COLOR_GREEN, passing_s, MUTEST_COLOR_NONE, " ",
+                      MUTEST_COLOR_LIGHT_GREY, delta_s, MUTEST_COLOR_NONE,
+                    NULL);
+
+      if (state->skip != 0)
+        mutest_print (STDOUT_FILENO,
+                      MUTEST_COLOR_YELLOW, skipped_s, MUTEST_COLOR_NONE,
+                      NULL);
+
+      if (state->fail != 0)
+        mutest_print (STDOUT_FILENO,
+                      MUTEST_COLOR_RED, failing_s, MUTEST_COLOR_NONE,
+                      NULL);
+
+      mutest_print (STDOUT_FILENO, "", NULL);
+    }
   else
     mutest_print (STDOUT_FILENO,
                   "\n",
