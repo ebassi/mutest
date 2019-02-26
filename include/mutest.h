@@ -278,6 +278,21 @@ mutest_to_be_null (mutest_expect_t *e,
                    mutest_expect_res_t *check);
 
 /**
+ * mutest_to_be_pointer:
+ * @e: a #mutest_expect_t
+ * @check: a #mutest_expect_res_t
+ *
+ * Checks that the value in @e is a pointer with the same
+ * address as @check.
+ *
+ * Returns: %true if the pointers are identical
+ */
+MUTEST_PUBLIC
+bool
+mutest_to_be_pointer (mutest_expect_t *e,
+                      mutest_expect_res_t *check);
+
+/**
  * mutest_to_be_int_value:
  * @e: a #mutest_expect_t
  * @check: a #mutest_expect_res_t

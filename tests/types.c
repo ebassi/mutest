@@ -24,6 +24,7 @@ check_scalars (mutest_spec_t *spec MUTEST_UNUSED)
   mutest_expect ("pointers",
                  mutest_pointer (p),
                  mutest_not, mutest_to_be_null,
+                 mutest_to_be_pointer, (void *) 0xdeadbeef,
                  NULL);
 }
 

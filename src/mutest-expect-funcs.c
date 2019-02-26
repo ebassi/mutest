@@ -66,6 +66,17 @@ mutest_to_be_null (mutest_expect_t *e,
 }
 
 bool
+mutest_to_be_pointer (mutest_expect_t *e,
+                      mutest_expect_res_t *check)
+{
+  if (e->value->expect_type == MUTEST_EXPECT_POINTER &&
+      check->expect_type == MUTEST_EXPECT_POINTER)
+    return e->value->expect.v_pointer == check->expect.v_pointer;
+
+  return false;
+}
+
+bool
 mutest_to_be_int_value (mutest_expect_t *e,
                         mutest_expect_res_t *check)
 {

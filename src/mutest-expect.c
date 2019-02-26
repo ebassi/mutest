@@ -30,6 +30,7 @@ static const struct {
   EXPECT_FUNC (mutest_to_be_true, false, MUTEST_EXPECT_BOOL_TRUE),
   EXPECT_FUNC (mutest_to_be_false, false, MUTEST_EXPECT_BOOL_FALSE),
   EXPECT_FUNC (mutest_to_be_null, false, MUTEST_EXPECT_POINTER_NULL),
+  EXPECT_FUNC (mutest_to_be_pointer, true, MUTEST_EXPECT_POINTER),
   EXPECT_FUNC (mutest_to_be_int_value, true, MUTEST_EXPECT_INT),
   EXPECT_FUNC (mutest_to_be_in_int_range, true, MUTEST_EXPECT_INT_RANGE),
   EXPECT_FUNC (mutest_to_be_float_value, true, MUTEST_EXPECT_FLOAT),
