@@ -1,5 +1,6 @@
 tests = [
   'general',
+  'hooks',
   'types',
 ]
 
