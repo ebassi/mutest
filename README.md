@@ -7,6 +7,8 @@
 µTest aims to be a small unit testing library for C projects, with an API
 heavily modelled on high level frameworks like Jasmine or Mocha.
 
+**WARNING**: µTest's API is still in flux until I mark the first release.
+
 ## Building µTest
 
 Simply clone this repository, and use [Meson](http://mesonbuild.com) to
