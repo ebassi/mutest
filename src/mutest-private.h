@@ -56,18 +56,37 @@ typedef enum {
 typedef enum {
   MUTEST_EXPECT_INVALID,
 
-  MUTEST_EXPECT_BOOL_TRUE,
-  MUTEST_EXPECT_BOOL_FALSE,
+  MUTEST_EXPECT_BOOLEAN,
   MUTEST_EXPECT_INT,
   MUTEST_EXPECT_INT_RANGE,
   MUTEST_EXPECT_FLOAT,
   MUTEST_EXPECT_FLOAT_RANGE,
   MUTEST_EXPECT_STR,
-  MUTEST_EXPECT_POINTER,
-  MUTEST_EXPECT_POINTER_NULL,
-  MUTEST_EXPECT_BYTE_ARRAY,
-  MUTEST_EXPECT_CLOSURE,
+  MUTEST_EXPECT_POINTER
 } mutest_expect_type_t;
+
+typedef enum {
+  MUTEST_COLLECT_NONE = 0,
+  MUTEST_COLLECT_INT = 1 << 0,
+  MUTEST_COLLECT_FLOAT = 1 << 1,
+  MUTEST_COLLECT_STRING = 1 << 2,
+  MUTEST_COLLECT_POINTER = 1 << 3,
+  MUTEST_COLLECT_BOOLEAN = 1 << 4,
+  MUTEST_COLLECT_PRECISION = 1 << 5,
+  MUTEST_COLLECT_RANGE = 1 << 6,
+  MUTEST_COLLECT_MATCHING_TYPE = 1 << 7,
+
+  MUTEST_COLLECT_NUMBER = MUTEST_COLLECT_INT | MUTEST_COLLECT_FLOAT,
+  MUTEST_COLLECT_SCALAR = MUTEST_COLLECT_INT |
+                          MUTEST_COLLECT_FLOAT |
+                          MUTEST_COLLECT_STRING |
+                          MUTEST_COLLECT_POINTER |
+                          MUTEST_COLLECT_BOOLEAN
+} mutest_collect_type_t;
+
+typedef mutest_expect_res_t *(* mutest_collect_func_t) (mutest_expect_type_t expect_type,
+                                                        mutest_collect_type_t collect_type,
+                                                        va_list args);
 
 struct _mutest_expect_res_t
 {
@@ -99,17 +118,6 @@ struct _mutest_expect_res_t
     } v_str;
 
     void *v_pointer;
-
-    struct {
-      void *data;
-      size_t element_size;
-      size_t length;
-    } v_bytearray;
-
-    struct {
-      mutest_expect_closure_func_t func;
-      void *data;
-    } v_closure;
   } expect;
 };
 
@@ -175,6 +183,9 @@ struct _mutest_suite_t
 # define mutest_unlikely(x)     (x)
 #endif
 
+mutest_expect_res_t *
+mutest_expect_res_alloc (mutest_expect_type_t type);
+
 void
 mutest_expect_res_free (mutest_expect_res_t *res);
 
@@ -231,13 +242,6 @@ mutest_add_fail (void);
 void
 mutest_add_skip (void);
 
-mutest_expect_res_t *
-mutest_expect_res_collect_value (mutest_expect_type_t type,
-                                 va_list args);
-
-mutest_expect_res_t *
-mutest_expect_res_default_value (mutest_expect_type_t type);
-
 void
 mutest_expect_res_to_string (mutest_expect_res_t *res,
                              char *buf,
@@ -268,6 +272,7 @@ mutest_print_expect (mutest_expect_t *expect);
 void
 mutest_print_expect_fail (mutest_expect_t *expect,
                           bool negate,
-                          mutest_expect_res_t *check);
+                          mutest_expect_res_t *check,
+                          const char *check_repr);
 
 MUTEST_END_DECLS

@@ -397,7 +397,8 @@ mutest_print_expect (mutest_expect_t *expect)
 void
 mutest_print_expect_fail (mutest_expect_t *expect,
                           bool negate,
-                          mutest_expect_res_t *check)
+                          mutest_expect_res_t *check,
+                          const char *check_repr)
 {
   mutest_output_format_t format = mutest_get_output_format ();
 
@@ -416,19 +417,20 @@ mutest_print_expect_fail (mutest_expect_t *expect,
 
   if (check != NULL)
     {
-      mutest_expect_res_to_string (check, rhs, 256);
+      if (check_repr != NULL)
+        snprintf (rhs, 256, "%s", check_repr);
+      else
+        mutest_expect_res_to_string (check, rhs, 256);
 
       switch (check->expect_type)
         {
         case MUTEST_EXPECT_INVALID:
           snprintf (comparison, 16, " ? ");
           break;
-        case MUTEST_EXPECT_BOOL_TRUE:
-        case MUTEST_EXPECT_BOOL_FALSE:
+        case MUTEST_EXPECT_BOOLEAN:
         case MUTEST_EXPECT_INT:
         case MUTEST_EXPECT_STR:
         case MUTEST_EXPECT_POINTER:
-        case MUTEST_EXPECT_POINTER_NULL:
           snprintf (comparison, 16, " %s ", negate ? "≢" : "≡");
           break;
         case MUTEST_EXPECT_FLOAT:
@@ -437,10 +439,6 @@ mutest_print_expect_fail (mutest_expect_t *expect,
         case MUTEST_EXPECT_INT_RANGE:
         case MUTEST_EXPECT_FLOAT_RANGE:
           snprintf (comparison, 16, " %s ", negate ? "∉" : "∈");
-          break;
-        case MUTEST_EXPECT_BYTE_ARRAY:
-        case MUTEST_EXPECT_CLOSURE:
-          comparison[0] = '\000';
           break;
         }
     }
