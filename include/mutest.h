@@ -610,7 +610,8 @@ mutest_it_full (const char *file,
  * be satisfied in order to pass the tests.
  */
 #define mutest_it(description,func) \
-  mutest_it_full (__FILE__, __LINE__, __func__, description, func)
+  mutest_it_full (__FILE__, __LINE__, __func__, description, \
+    (mutest_spec_func_t)(void (*)(void)) func)
 
 MUTEST_PUBLIC
 void
@@ -633,7 +634,8 @@ mutest_describe_full (const char *file,
  * Each test binary can contain multiple test suites.
  */
 #define mutest_describe(description,func) \
-  mutest_describe_full (__FILE__, __LINE__, __func__, description, func)
+  mutest_describe_full (__FILE__, __LINE__, __func__, description, \
+    (mutest_describe_func_t)(void (*)(void)) func)
 
 /* }}} */
 
