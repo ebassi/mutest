@@ -24,7 +24,7 @@ endif
 
 mutest_link_args = cc.get_supported_link_arguments(test_link_args)
 
-mutest_lib = library(
+mutest_lib = both_libraries(
   mutest_api_path,
   sources: sources,
   version: mutest_soversion,
@@ -38,7 +38,7 @@ mutest_lib = library(
 )
 
 mutest_dep = declare_dependency(
-  link_with: mutest_lib,
+  link_whole: mutest_lib.get_static_lib(),
   include_directories: headers_inc,
 )
 
