@@ -114,6 +114,9 @@ if buildtype.startswith('debug')
   add_project_arguments([ '-DMUTEST_ENABLE_DEBUG' ], language: 'c')
 endif
 
+static = get_option('static')
+installable = not (static and meson.is_subproject())
+
 subdir('include')
 subdir('src')
 subdir('tests')
