@@ -14,9 +14,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
+#endif
+#ifdef HAVE_TYPES_H
 #include <sys/types.h>
+#endif
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 static mutest_state_t global_state = {
   .initialized = false,
@@ -122,7 +129,9 @@ mutest_add_skip (void)
 static void
 update_term_caps (void)
 {
+#ifdef HAVE_ISATTY
   global_state.is_tty = isatty (STDOUT_FILENO);
+#endif
 
   if (!global_state.is_tty)
     {
@@ -165,16 +174,18 @@ update_term_caps (void)
 static void
 update_term_size (void)
 {
-  struct winsize ws;
-
   if (!global_state.is_tty)
     return;
+
+#ifdef HAVE_SYS_IOCTL_H
+  struct winsize ws;
 
   if (ioctl (STDOUT_FILENO, TIOCGWINSZ, &ws) != 0)
     perror ("ioctl");
 
   global_state.term_width = ws.ws_col;
   global_state.term_height = ws.ws_row;
+#endif
 }
 
 void

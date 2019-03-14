@@ -8,6 +8,30 @@ sources = [
   'mutest-utils.c',
 ]
 
+test_headers = [
+  'sys/ioctl.h',
+  'sys/types.h',
+  'unistd.h',
+]
+
+foreach h: test_headers
+  if cc.has_header(h)
+    define = 'HAVE_' + h.underscorify().to_upper()
+    config_h.set(define, 1)
+  endif
+endforeach
+
+test_functions = [
+  [ 'isatty', 'unistd.h' ]
+]
+
+foreach f: test_functions
+  if cc.has_function(f[0], prefix: '#include <@0@>'.format(f[1]))
+    define = 'HAVE_' + f[0].underscorify().to_upper()
+    config_h.set(define, 1)
+  endif
+endforeach
+
 configure_file(output: 'config.h', configuration: config_h)
 
 test_link_args = []
