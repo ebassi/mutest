@@ -138,6 +138,15 @@ mutest_bool_value (bool value)
   return res;
 }
 
+bool
+mutest_get_bool_value (const mutest_expect_res_t *res)
+{
+  if (res->expect_type != MUTEST_EXPECT_BOOLEAN)
+    mutest_assert_if_reached ("invalid boolean value");
+
+  return res->expect.v_bool;
+}
+
 mutest_expect_res_t *
 mutest_int_value (int value)
 {
@@ -149,6 +158,15 @@ mutest_int_value (int value)
   res->expect.v_int = value;
 
   return res;
+}
+
+int
+mutest_get_int_value (const mutest_expect_res_t *res)
+{
+  if (res->expect_type != MUTEST_EXPECT_INT)
+    mutest_assert_if_reached ("invalid integer value");
+
+  return res->expect.v_int;
 }
 
 mutest_expect_res_t *
@@ -168,6 +186,15 @@ mutest_string_value (const char *value)
   return res;
 }
 
+const char *
+mutest_get_string_value (const mutest_expect_res_t *res)
+{
+  if (res->expect_type != MUTEST_EXPECT_STR)
+    mutest_assert_if_reached ("invalid string value");
+
+  return res->expect.v_str.str;
+}
+
 mutest_expect_res_t *
 mutest_float_value (double value)
 {
@@ -180,6 +207,15 @@ mutest_float_value (double value)
   res->expect.v_float.tolerance = DBL_EPSILON;
 
   return res;
+}
+
+double
+mutest_get_float_value (const mutest_expect_res_t *res)
+{
+  if (res->expect_type != MUTEST_EXPECT_FLOAT)
+    mutest_assert_if_reached ("invalid floating point value");
+
+  return res->expect.v_float.value;
 }
 
 mutest_expect_res_t *
@@ -197,6 +233,20 @@ mutest_int_range (int min,
   return res;
 }
 
+void
+mutest_get_int_range (const mutest_expect_res_t *res,
+                      int *min,
+                      int *max)
+{
+  if (res->expect_type != MUTEST_EXPECT_INT_RANGE)
+    mutest_assert_if_reached ("invalid integer range");
+
+  if (min != NULL)
+    *min = res->expect.v_irange.min;
+  if (max != NULL)
+    *max = res->expect.v_irange.max;
+}
+
 mutest_expect_res_t *
 mutest_float_range (double min,
                     double max)
@@ -212,17 +262,40 @@ mutest_float_range (double min,
   return res;
 }
 
+void
+mutest_get_float_range (const mutest_expect_res_t *res,
+                        double *min,
+                        double *max)
+{
+  if (res->expect_type != MUTEST_EXPECT_FLOAT_RANGE)
+    mutest_assert_if_reached ("invalid floating point range");
+
+  if (min != NULL)
+    *min = res->expect.v_frange.min;
+  if (max != NULL)
+    *max = res->expect.v_frange.max;
+}
+
 mutest_expect_res_t *
-mutest_pointer (void *pointer)
+mutest_pointer (const void *pointer)
 {
   mutest_expect_res_t *res = malloc (sizeof (mutest_expect_res_t));
   if (res == NULL)
     mutest_oom_abort ();
 
   res->expect_type = MUTEST_EXPECT_POINTER;
-  res->expect.v_pointer = pointer;
+  res->expect.v_pointer = (void *) pointer;
 
   return res;
+}
+
+const void *
+mutest_get_pointer (const mutest_expect_res_t *res)
+{
+  if (res->expect_type != MUTEST_EXPECT_POINTER)
+    mutest_assert_if_reached ("invalid pointer");
+
+  return res->expect.v_pointer;
 }
 
 #if 0

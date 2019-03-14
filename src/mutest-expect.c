@@ -430,3 +430,12 @@ mutest_expect_full (const char *file,
 
   va_end (args);
 }
+
+mutest_expect_res_t *
+mutest_expect_value (mutest_expect_t *e)
+{
+  if (e == NULL)
+    mutest_assert_if_reached ("invalid expectation");
+
+  return e->value;
+}

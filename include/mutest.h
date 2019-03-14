@@ -128,6 +128,10 @@ MUTEST_PUBLIC
 mutest_expect_res_t *
 mutest_bool_value (bool value);
 
+MUTEST_PUBLIC
+bool
+mutest_get_bool_value (const mutest_expect_res_t *res);
+
 /**
  * mutest_int_value:
  * @value: an integer scalar
@@ -139,6 +143,10 @@ mutest_bool_value (bool value);
 MUTEST_PUBLIC
 mutest_expect_res_t *
 mutest_int_value (int value);
+
+MUTEST_PUBLIC
+int
+mutest_get_int_value (const mutest_expect_res_t *res);
 
 /**
  * mutest_string_value:
@@ -152,6 +160,10 @@ MUTEST_PUBLIC
 mutest_expect_res_t *
 mutest_string_value (const char *value);
 
+MUTEST_PUBLIC
+const char *
+mutest_get_string_value (const mutest_expect_res_t *res);
+
 /**
  * mutest_float_value:
  * @value: a floating point scalar
@@ -163,6 +175,10 @@ mutest_string_value (const char *value);
 MUTEST_PUBLIC
 mutest_expect_res_t *
 mutest_float_value (double value);
+
+MUTEST_PUBLIC
+double
+mutest_get_float_value (const mutest_expect_res_t *res);
 
 /**
  * mutest_int_range:
@@ -179,6 +195,12 @@ mutest_expect_res_t *
 mutest_int_range (int min,
                   int max);
 
+MUTEST_PUBLIC
+void
+mutest_get_int_range (const mutest_expect_res_t *res,
+                      int *min,
+                      int *max);
+
 /**
  * mutest_float_range:
  * @min: the minimum value of a range
@@ -194,6 +216,12 @@ mutest_expect_res_t *
 mutest_float_range (double min,
                     double max);
 
+MUTEST_PUBLIC
+void
+mutest_get_float_range (const mutest_expect_res_t *res,
+                        double *min,
+                        double *max);
+
 /**
  * mutest_pointer:
  * @pointer: a generic pointer
@@ -204,7 +232,11 @@ mutest_float_range (double min,
  */
 MUTEST_PUBLIC
 mutest_expect_res_t *
-mutest_pointer (void *pointer);
+mutest_pointer (const void *pointer);
+
+MUTEST_PUBLIC
+const void *
+mutest_get_pointer (const mutest_expect_res_t *res);
 
 /* }}} */
 
@@ -559,6 +591,10 @@ MUTEST_PUBLIC
 bool
 mutest_to_end_with_string (mutest_expect_t *e,
                            mutest_expect_res_t *check);
+
+MUTEST_PUBLIC
+mutest_expect_res_t *
+mutest_expect_value (mutest_expect_t *expect);
 
 /* }}} */
 
