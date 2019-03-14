@@ -34,6 +34,11 @@ mutest_it_full (const char *file,
     .file = file,
     .line = line,
     .func_name = func_name,
+    .skip_all = false,
+    .n_tests = 0,
+    .pass = 0,
+    .fail = 0,
+    .skip = 0,
   };
 
   mutest_print_spec_preamble (&spec);
@@ -45,9 +50,16 @@ mutest_it_full (const char *file,
   if (suite->before_each_hook != NULL)
     suite->before_each_hook ();
 
-  spec.start_time = mutest_get_current_time (),
+  spec.start_time = mutest_get_current_time ();
 
-  func (&spec);
+  if (!suite->skip_all)
+    func (&spec);
+  else
+    {
+      spec.n_tests += 1;
+      spec.skip += 1;
+      mutest_add_skip ();
+    }
 
   spec.end_time = mutest_get_current_time ();
 
@@ -57,6 +69,16 @@ mutest_it_full (const char *file,
   mutest_set_current_spec (NULL);
 
   mutest_print_spec_totals (&spec);
+}
+
+void
+mutest_spec_skip (const char *reason)
+{
+  mutest_spec_t *spec = mutest_get_current_spec ();
+  if (spec == NULL)
+    mutest_assert_if_reached ("skip called without a spec");
+
+  spec->skip_all = true;
 }
 
 void

@@ -67,6 +67,7 @@ mutest_describe_full (const char *file,
     .line = line,
     .func_name = func_name,
     .description = description,
+    .skip_all = false,
   };
 
   mutest_set_current_suite (&suite);
@@ -78,16 +79,32 @@ mutest_describe_full (const char *file,
 
   mutest_print_suite_preamble (&suite);
 
-  suite.start_time = mutest_get_current_time ();
-
-  func (&suite);
-
-  suite.end_time = mutest_get_current_time ();
+  if (!suite.skip_all)
+    {
+      suite.start_time = mutest_get_current_time ();
+      func (&suite);
+      suite.end_time = mutest_get_current_time ();
+    }
+  else
+    {
+      state->n_tests += 1;
+      state->skip += 1;
+    }
 
   if (state->after_hook != NULL)
     state->after_hook ();
 
   mutest_set_current_suite (NULL);
+}
+
+void
+mutest_suite_skip (const char *reason)
+{
+  mutest_suite_t *suite = mutest_get_current_suite ();
+  if (suite == NULL)
+    mutest_assert_if_reached ("skip called without a suite");
+
+  suite->skip_all = true;
 }
 
 void

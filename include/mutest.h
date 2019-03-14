@@ -602,6 +602,14 @@ mutest_expect_value (mutest_expect_t *expect);
 
 MUTEST_PUBLIC
 void
+mutest_suite_skip (const char *reason);
+
+MUTEST_PUBLIC
+void
+mutest_spec_skip (const char *reason);
+
+MUTEST_PUBLIC
+void
 mutest_expect_full (const char *file,
                     int line,
                     const char *func_name,
