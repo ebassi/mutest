@@ -233,8 +233,14 @@ mutest_report (void)
 
   mutest_print_totals ();
 
-  if (global_state.n_tests == global_state.skip)
-    return 77;
+  if (global_state.output_format != MUTEST_OUTPUT_TAP)
+    {
+      /* The Autotools test harness uses the 77 exit code to signify
+       * that all tests have been skipped
+       */
+      if (global_state.n_tests == global_state.skip)
+        return 77;
+    }
 
   return global_state.fail == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
