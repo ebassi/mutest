@@ -403,8 +403,8 @@ mutest_expect_full (const char *file,
 
       /* If we're using a custom matcher then we collect
        * the value as a pointer instead of unpacking raw
-       * arguments. The ownership of the comparisor value
-       * is transferred to us.
+       * arguments. The ownership of the comparison value
+       * is transferred to us in any case.
        */
       if (check == NULL)
         check = va_arg (args, mutest_expect_res_t *);
@@ -424,11 +424,13 @@ mutest_expect_full (const char *file,
       matcher_func = va_arg (args, void *);
     }
 
+  va_end (args);
+
   mutest_spec_add_result (mutest_get_current_spec (), &e);
 
   mutest_print_expect (&e);
 
-  va_end (args);
+  mutest_expect_res_free (value);
 }
 
 mutest_expect_res_t *
