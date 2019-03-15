@@ -5,8 +5,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "config.h"
-
 #include "mutest-private.h"
 
 #include <string.h>
