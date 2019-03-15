@@ -25,6 +25,7 @@ cd _build
 ninja
 
 # Test
+export MUTEST_OUTPUT=tap
 meson test || {
   cat meson-logs/testlog.txt
   exit 1
