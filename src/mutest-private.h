@@ -189,6 +189,11 @@ struct _mutest_suite_t
 # define mutest_unlikely(x)     (x)
 #endif
 
+#ifdef OS_WINDOWS
+# define strdup(x) _strdup(x)
+# define write(fd,buf,count) _write(fd, buf, count)
+#endif
+
 mutest_expect_res_t *
 mutest_expect_res_alloc (mutest_expect_type_t type);
 
