@@ -9,14 +9,23 @@
 
 #include "mutest-private.h"
 
-#include <fcntl.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include <time.h>
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#ifdef OS_WINDOWS
+#include <windows.h>
+#endif
 
 #define ANSI_ESCAPE             "\033"
 
@@ -31,9 +40,41 @@
 #define MUTEST_UNDERLINE_DEFAULT        ANSI_ESCAPE "[4;39m"
 #define MUTEST_DIM_DEFAULT              ANSI_ESCAPE "[2;39m"
 
+#if defined(OS_WINDOWS) && !defined(STDOUT_FILENO)
+# define STDOUT_FILENO _fileno(stdout)
+#endif
+
+#if defined(OS_WINDOWS) && !defined(STDERR_FILENO)
+# define STDERR_FILENO _fileno(stderr)
+#endif
+
 // mutest_get_current_time:
 //
 // Returns: the current time, in microseconds
+#ifdef HAVE_QUERY_PERFORMANCE_COUNTER
+static double usec_per_tick;
+
+int64_t
+mutest_get_current_time (void)
+{
+  if (mutest_unlikely (usec_per_tick == 0))
+    {
+      LARGE_INTEGER freq;
+
+      if (!QueryPerformanceFrequency (&freq) || freq.QuadPart == 0)
+        mutest_assert_if_reached ("QueryPerformanceFrequency failed");
+
+      usec_per_tick = (double) 1000000 / freq.QuadPart;
+    }
+
+  LARGE_INTEGER ticks;
+
+  if (QueryPerformanceCounter (&ticks))
+    return (int64_t) (ticks.QuadPart * usec_per_tick);
+
+  return 0;
+}
+#elif defined(HAVE_CLOCK_GETTIME)
 int64_t
 mutest_get_current_time (void)
 {
@@ -47,6 +88,9 @@ mutest_get_current_time (void)
 
   return (((int64_t) ts.tv_sec) * 1000000) + (ts.tv_nsec / 1000);
 }
+#else
+# error "muTest requires a monotonic clock implementation"
+#endif
 
 void
 mutest_print (int fd,

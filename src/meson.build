@@ -12,6 +12,7 @@ test_headers = [
   'sys/ioctl.h',
   'sys/types.h',
   'unistd.h',
+  'fcntl.h',
 ]
 
 foreach h: test_headers
@@ -22,15 +23,23 @@ foreach h: test_headers
 endforeach
 
 test_functions = [
-  [ 'isatty', 'unistd.h' ]
+  [ 'isatty', 'unistd.h' ],
+  [ 'clock_gettime', 'time.h' ],
 ]
 
 foreach f: test_functions
-  if cc.has_function(f[0], prefix: '#include <@0@>'.format(f[1]))
+  if cc.has_function(f[0], prefix: '#define _GNU_SOURCE\n#include <@0@>'.format(f[1]))
     define = 'HAVE_' + f[0].underscorify().to_upper()
     config_h.set(define, 1)
   endif
 endforeach
+
+if host_machine.system() == 'windows'
+  config_h.set('OS_WINDOWS', 1)
+  if cc.has_function('QueryPerformanceCounter', prefix: '#include <windows.h>')
+    config_h.set('HAVE_QUERY_PERFORMANCE_COUNTER', 1)
+  endif
+endif
 
 configure_file(output: 'config.h', configuration: config_h)
 
