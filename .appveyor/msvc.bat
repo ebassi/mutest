@@ -1,6 +1,6 @@
 @echo on
 
-set MESON_VERSION = "0.50.0"
+set MESON_VERSION="0.50.0"
 
 :: Download Meson and Ninja, create install directory
 mkdir _build
