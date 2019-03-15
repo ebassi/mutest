@@ -23,6 +23,7 @@
 #endif
 #ifdef OS_WINDOWS
 #include <windows.h>
+#include <io.h>
 #endif
 
 #define ANSI_ESCAPE             "\033"
