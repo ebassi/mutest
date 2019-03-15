@@ -25,4 +25,7 @@ cd _build
 ninja
 
 # Test
-meson test
+meson test || {
+  cat meson-logs/testlog.txt
+  exit 1
+}
