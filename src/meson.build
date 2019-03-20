@@ -63,6 +63,7 @@ else
   mutest_lib = library(
     mutest_api_path,
     sources: sources,
+    install: installable,
     version: mutest_soversion,
     c_args: common_flags + [
       '-DMUTEST_COMPILATION',
