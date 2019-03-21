@@ -13,6 +13,7 @@
 
 #include "mutest.h"
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdarg.h>
 
@@ -190,8 +191,7 @@ struct _mutest_suite_t
 #endif
 
 #ifdef OS_WINDOWS
-# define strdup(x) _strdup(x)
-# define write(fd,buf,count) _write(fd, buf, count)
+# define strdup(x) mutest_strdup(x)
 #endif
 
 mutest_expect_res_t *
@@ -200,8 +200,11 @@ mutest_expect_res_alloc (mutest_expect_type_t type);
 void
 mutest_expect_res_free (mutest_expect_res_t *res);
 
+char *
+mutest_strdup (const char *str);
+
 void
-mutest_print (int fd,
+mutest_print (FILE *stram,
               const char *first_fragment,
               ...) MUTEST_NULL_TERMINATED;
 
