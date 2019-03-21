@@ -181,7 +181,7 @@ mutest_collect_string (mutest_expect_type_t value_type MUTEST_UNUSED,
   mutest_expect_res_t *retval = mutest_expect_res_alloc (MUTEST_EXPECT_STR);
 
   char *str = va_arg (args, char *);
-  retval->expect.v_str.str = strdup (str);
+  retval->expect.v_str.str = mutest_strdup (str);
   retval->expect.v_str.len = str != NULL ? strlen (str) : 0;
 
   return retval;

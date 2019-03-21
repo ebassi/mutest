@@ -89,7 +89,7 @@ mutest_strdup (const char *str)
   if (str == NULL)
     return NULL;
 
-  size_t len = strlen (str);
+  size_t len = strlen (str) + 1;
   char *res = malloc (len * sizeof (char));
   if (res == NULL)
     mutest_oom_abort ();
