@@ -66,6 +66,7 @@ check_string (mutest_spec_t *spec MUTEST_UNUSED)
   mutest_expect ("exact string",
                  mutest_string_value ("hello, world"),
                  mutest_to_be, "hello, world",
+                 mutest_not, mutest_to_be, NULL,
                  NULL);
   mutest_expect ("substring",
                  mutest_string_value ("hello, world"),
