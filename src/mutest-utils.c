@@ -5,18 +5,26 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "config.h"
-
 #include "mutest-private.h"
 
-#include <fcntl.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include <time.h>
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#ifdef OS_WINDOWS
+#include <windows.h>
+#include <io.h>
+#endif
 
 #define ANSI_ESCAPE             "\033"
 
@@ -34,6 +42,30 @@
 // mutest_get_current_time:
 //
 // Returns: the current time, in microseconds
+#ifdef HAVE_QUERY_PERFORMANCE_COUNTER
+static double usec_per_tick;
+
+int64_t
+mutest_get_current_time (void)
+{
+  if (mutest_unlikely (usec_per_tick == 0))
+    {
+      LARGE_INTEGER freq;
+
+      if (!QueryPerformanceFrequency (&freq) || freq.QuadPart == 0)
+        mutest_assert_if_reached ("QueryPerformanceFrequency failed");
+
+      usec_per_tick = (double) 1000000 / freq.QuadPart;
+    }
+
+  LARGE_INTEGER ticks;
+
+  if (QueryPerformanceCounter (&ticks))
+    return (int64_t) (ticks.QuadPart * usec_per_tick);
+
+  return 0;
+}
+#elif defined(HAVE_CLOCK_GETTIME)
 int64_t
 mutest_get_current_time (void)
 {
@@ -47,9 +79,28 @@ mutest_get_current_time (void)
 
   return (((int64_t) ts.tv_sec) * 1000000) + (ts.tv_nsec / 1000);
 }
+#else
+# error "muTest requires a monotonic clock implementation"
+#endif
+
+char *
+mutest_strdup (const char *str)
+{
+  if (str == NULL)
+    return NULL;
+
+  size_t len = strlen (str) + 1;
+  char *res = malloc (len * sizeof (char));
+  if (res == NULL)
+    mutest_oom_abort ();
+
+  memcpy (res, str, len * sizeof (char));
+
+  return res;
+}
 
 void
-mutest_print (int fd,
+mutest_print (FILE *stream,
               const char *first_fragment,
               ...)
 {
@@ -60,15 +111,24 @@ mutest_print (int fd,
   const char *fragment = first_fragment;
   while (fragment != NULL)
     {
+#ifdef OS_WINDOWS
       if (fragment[0] != '\0')
-        write (fd, fragment, strlen (fragment));
+        fprintf (stream, "%s", fragment);
+#else
+      if (fragment[0] != '\0')
+        write (fileno (stream), fragment, strlen (fragment));
+#endif
 
       fragment = va_arg (args, char *);
     }
 
   va_end (args);
 
-  write (fd, "\n", 1);
+#ifdef OS_WINDOWS
+  fputc ('\n', stream);
+#else
+  write (fileno (stream), "\n", 1);
+#endif
 }
 
 void
@@ -88,14 +148,14 @@ mutest_assert_message (const char *file,
   snprintf (lstr, 32, "%d", line);
 
   if (mutest_use_colors ())
-    mutest_print (STDERR_FILENO,
+    mutest_print (stderr,
                   MUTEST_COLOR_RED, "ERROR", MUTEST_COLOR_NONE, ": ",
                   file, ":", lstr, ":", func != NULL ? func : "<local>",
                   " ",
                   message,
                   NULL);
   else
-    mutest_print (STDERR_FILENO,
+    mutest_print (stderr,
                   "ERROR: ", file, ":", lstr, ":", func != NULL ? func : "<local>", " ",
                   message,
                   NULL);
@@ -127,13 +187,13 @@ static void
 mocha_suite_preamble (mutest_suite_t *suite)
 {
   if (mutest_use_colors ())
-    mutest_print (STDOUT_FILENO,
+    mutest_print (stdout,
                   "\n",
                   "  ",
                   MUTEST_BOLD_DEFAULT, suite->description, MUTEST_COLOR_NONE,
                   NULL);
   else
-    mutest_print (STDOUT_FILENO,
+    mutest_print (stdout,
                   "\n",
                   "  ", suite->description,
                   NULL);
@@ -146,37 +206,37 @@ mocha_expect_result (mutest_expect_t *expect)
     {
     case MUTEST_RESULT_PASS:
       if (mutest_use_colors ())
-        mutest_print (STDOUT_FILENO,
+        mutest_print (stdout,
                       "     ",
                       MUTEST_COLOR_GREEN, " ✓ ", MUTEST_DIM_DEFAULT, expect->description,
                       MUTEST_COLOR_NONE,
                       NULL);
       else
-        mutest_print (STDOUT_FILENO,
+        mutest_print (stdout,
                       "      ✓ ", expect->description,
                       NULL);
       break;
 
     case MUTEST_RESULT_FAIL:
       if (mutest_use_colors ())
-        mutest_print (STDOUT_FILENO,
+        mutest_print (stdout,
                       "     ",
                       MUTEST_COLOR_RED, " ✗ ", expect->description, MUTEST_COLOR_NONE,
                       NULL);
       else
-        mutest_print (STDOUT_FILENO,
+        mutest_print (stdout,
                       "      ✗ ", expect->description,
                       NULL);
       break;
 
     case MUTEST_RESULT_SKIP:
       if (mutest_use_colors ())
-        mutest_print (STDOUT_FILENO,
+        mutest_print (stdout,
                       "     ",
                       MUTEST_COLOR_YELLOW, " - ", expect->description, MUTEST_COLOR_NONE,
                       NULL);
       else
-        mutest_print (STDOUT_FILENO,
+        mutest_print (stdout,
                       "      - ", expect->description,
                       NULL);
       break;
@@ -186,7 +246,7 @@ mocha_expect_result (mutest_expect_t *expect)
 static void
 mocha_spec_preamble (mutest_spec_t *spec)
 {
-  mutest_print (STDOUT_FILENO,
+  mutest_print (stdout,
                 "    ",
                 spec->description,
                 NULL);
@@ -210,7 +270,7 @@ mocha_spec_results (mutest_spec_t *spec)
 
   if (mutest_use_colors ())
     {
-      mutest_print (STDOUT_FILENO,
+      mutest_print (stdout,
                     "\n",
                     "      ",
                     MUTEST_COLOR_GREEN, passing_s, MUTEST_COLOR_NONE, " ",
@@ -218,21 +278,21 @@ mocha_spec_results (mutest_spec_t *spec)
                     NULL);
 
       if (spec->skip != 0)
-        mutest_print (STDOUT_FILENO,
+        mutest_print (stdout,
                       "      ",
                       MUTEST_COLOR_YELLOW, skipped_s, MUTEST_COLOR_NONE,
                       NULL);
 
       if (spec->fail != 0)
-        mutest_print (STDOUT_FILENO,
+        mutest_print (stdout,
                       "      ",
                       MUTEST_COLOR_RED, failing_s, MUTEST_COLOR_NONE,
                       NULL);
 
-      mutest_print (STDOUT_FILENO, "", NULL);
+      mutest_print (stdout, "", NULL);
     }
   else
-    mutest_print (STDOUT_FILENO,
+    mutest_print (stdout,
                   "\n",
                   "      ", passing_s, " ", delta_s, "\n",
                   "      ", skipped_s, "\n",
@@ -263,7 +323,7 @@ mocha_total_results (mutest_state_t *state)
 
   if (mutest_use_colors ())
     {
-      mutest_print (STDOUT_FILENO,
+      mutest_print (stdout,
                     "\n",
                     MUTEST_UNDERLINE_DEFAULT, "Total", MUTEST_COLOR_NONE, "\n",
                     MUTEST_COLOR_GREEN, passing_s, MUTEST_COLOR_NONE, " ",
@@ -271,19 +331,19 @@ mocha_total_results (mutest_state_t *state)
                     NULL);
 
       if (state->skip != 0)
-        mutest_print (STDOUT_FILENO,
+        mutest_print (stdout,
                       MUTEST_COLOR_YELLOW, skipped_s, MUTEST_COLOR_NONE,
                       NULL);
 
       if (state->fail != 0)
-        mutest_print (STDOUT_FILENO,
+        mutest_print (stdout,
                       MUTEST_COLOR_RED, failing_s, MUTEST_COLOR_NONE,
                       NULL);
 
-      mutest_print (STDOUT_FILENO, "", NULL);
+      mutest_print (stdout, "", NULL);
     }
   else
-    mutest_print (STDOUT_FILENO,
+    mutest_print (stdout,
                   "\n",
                   "  Total\n",
                   "  ", passing_s, " ", delta_s, "\n",
@@ -304,19 +364,19 @@ tap_expect_result (mutest_expect_t *expect)
   switch (expect->result)
     {
     case MUTEST_RESULT_PASS:
-      mutest_print (STDOUT_FILENO,
+      mutest_print (stdout,
                     "ok ", num, " ", expect->description,
                     NULL);
       break;
 
     case MUTEST_RESULT_FAIL:
-      mutest_print (STDOUT_FILENO,
+      mutest_print (stdout,
                     "not ok ", num, " ", expect->description,
                     NULL);
       break;
 
     case MUTEST_RESULT_SKIP:
-      mutest_print (STDOUT_FILENO,
+      mutest_print (stdout,
                     "ok ", num, " # skip: ", expect->description,
                     NULL);
       break;
@@ -326,27 +386,27 @@ tap_expect_result (mutest_expect_t *expect)
 static void
 tap_spec_preamble (mutest_spec_t *spec)
 {
-  mutest_print (STDOUT_FILENO, "# ", spec->description, NULL);
+  mutest_print (stdout, "# ", spec->description, NULL);
 }
 
 static void
 tap_suite_preamble (mutest_suite_t *suite)
 {
-  mutest_print (STDOUT_FILENO, "# ", suite->description, NULL);
+  mutest_print (stdout, "# ", suite->description, NULL);
 }
 
 static void
 tap_total_results (mutest_state_t *state)
 {
   if (state->n_tests == state->skip)
-    mutest_print (STDOUT_FILENO, "1..0 # skip", NULL);
+    mutest_print (stdout, "1..0 # skip", NULL);
   else
     {
       char plan[128];
 
       snprintf (plan, 128, "1..%d", state->n_tests);
 
-      mutest_print (STDOUT_FILENO, plan, NULL);
+      mutest_print (stdout, plan, NULL);
     }
 }
 
@@ -450,7 +510,7 @@ mutest_print_expect_fail (mutest_expect_t *expect,
 
   if (mutest_use_colors ())
     {
-      mutest_print (STDOUT_FILENO,
+      mutest_print (stdout,
                     "      ",
                     MUTEST_COLOR_RED, "Assertion failure: ",
                     lhs, comparison, rhs,
@@ -459,7 +519,7 @@ mutest_print_expect_fail (mutest_expect_t *expect,
     }
   else
     {
-      mutest_print (STDOUT_FILENO,
+      mutest_print (stdout,
                     "      ",
                     "Assertion failure: ",
                     lhs, " ", comparison, " ", rhs,

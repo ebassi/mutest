@@ -5,8 +5,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "config.h"
-
 #include "mutest-private.h"
 
 #include <stdlib.h>
@@ -177,7 +175,7 @@ mutest_string_value (const char *value)
     mutest_oom_abort ();
 
   res->expect_type = MUTEST_EXPECT_STR;
-  res->expect.v_str.str = strdup (value);
+  res->expect.v_str.str = mutest_strdup (value);
   if (res->expect.v_str.str == NULL)
     mutest_oom_abort ();
 

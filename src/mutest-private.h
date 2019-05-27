@@ -9,8 +9,11 @@
 
 #pragma once
 
+#include "config.h"
+
 #include "mutest.h"
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdarg.h>
 
@@ -86,7 +89,7 @@ typedef enum {
 
 typedef mutest_expect_res_t *(* mutest_collect_func_t) (mutest_expect_type_t expect_type,
                                                         mutest_collect_type_t collect_type,
-                                                        va_list args);
+                                                        va_list *args);
 
 struct _mutest_expect_res_t
 {
@@ -193,8 +196,11 @@ mutest_expect_res_alloc (mutest_expect_type_t type);
 void
 mutest_expect_res_free (mutest_expect_res_t *res);
 
+char *
+mutest_strdup (const char *str);
+
 void
-mutest_print (int fd,
+mutest_print (FILE *stram,
               const char *first_fragment,
               ...) MUTEST_NULL_TERMINATED;
 
