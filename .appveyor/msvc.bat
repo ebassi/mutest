@@ -22,7 +22,7 @@ cd ..
 cd _build
 call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %MSVC_PLATFORM%
 @echo on
-C:\Python36\python.exe meson-%MESON_VERSION%\meson.py .. . --backend=ninja --prefix=%APPVEYOR_BUILD_FOLDER%\mutest-shared-%MSVC_PLATFORM% || goto :error
+C:\Python36\python.exe meson-%MESON_VERSION%\meson.py .. . -Dstatic=true --backend=ninja --prefix=%APPVEYOR_BUILD_FOLDER%\mutest-shared-%MSVC_PLATFORM% || goto :error
 ninja || goto :error
 ninja test || goto :error
 ninja install || goto :error

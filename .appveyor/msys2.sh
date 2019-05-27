@@ -20,7 +20,7 @@ pacman --noconfirm -S --needed \
     mingw-w64-$MSYS2_ARCH-pkg-config \
 
 # Build
-meson _build
+meson _build -Dstatic=true
 cd _build
 ninja
 
