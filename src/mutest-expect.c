@@ -17,7 +17,7 @@
 static mutest_expect_res_t *
 mutest_collect_true (mutest_expect_type_t value_type MUTEST_UNUSED,
                      mutest_collect_type_t collect_type MUTEST_UNUSED,
-                     va_list args MUTEST_UNUSED)
+                     va_list *args MUTEST_UNUSED)
 {
   mutest_expect_res_t *retval = mutest_expect_res_alloc (MUTEST_EXPECT_BOOLEAN);
 
@@ -29,7 +29,7 @@ mutest_collect_true (mutest_expect_type_t value_type MUTEST_UNUSED,
 static mutest_expect_res_t *
 mutest_collect_false (mutest_expect_type_t value_type MUTEST_UNUSED,
                       mutest_collect_type_t collect_type MUTEST_UNUSED,
-                      va_list args MUTEST_UNUSED)
+                      va_list *args MUTEST_UNUSED)
 {
   mutest_expect_res_t *retval = mutest_expect_res_alloc (MUTEST_EXPECT_BOOLEAN);
 
@@ -41,7 +41,7 @@ mutest_collect_false (mutest_expect_type_t value_type MUTEST_UNUSED,
 static mutest_expect_res_t *
 mutest_collect_null (mutest_expect_type_t value_type MUTEST_UNUSED,
                      mutest_collect_type_t collect_type MUTEST_UNUSED,
-                     va_list args MUTEST_UNUSED)
+                     va_list *args MUTEST_UNUSED)
 {
   mutest_expect_res_t *retval = mutest_expect_res_alloc (MUTEST_EXPECT_POINTER);
 
@@ -53,7 +53,7 @@ mutest_collect_null (mutest_expect_type_t value_type MUTEST_UNUSED,
 static mutest_expect_res_t *
 mutest_collect_nan (mutest_expect_type_t value_type MUTEST_UNUSED,
                     mutest_collect_type_t collect_type MUTEST_UNUSED,
-                    va_list args MUTEST_UNUSED)
+                    va_list *args MUTEST_UNUSED)
 {
   mutest_expect_res_t *retval = mutest_expect_res_alloc (MUTEST_EXPECT_FLOAT);
 
@@ -66,7 +66,7 @@ mutest_collect_nan (mutest_expect_type_t value_type MUTEST_UNUSED,
 static mutest_expect_res_t *
 mutest_collect_infinity (mutest_expect_type_t value_type MUTEST_UNUSED,
                          mutest_collect_type_t collect_type MUTEST_UNUSED,
-                         va_list args MUTEST_UNUSED)
+                         va_list *args MUTEST_UNUSED)
 {
   mutest_expect_res_t *retval = mutest_expect_res_alloc (MUTEST_EXPECT_FLOAT);
 
@@ -79,11 +79,11 @@ mutest_collect_infinity (mutest_expect_type_t value_type MUTEST_UNUSED,
 static mutest_expect_res_t *
 mutest_collect_boolean (mutest_expect_type_t value_type MUTEST_UNUSED,
                         mutest_collect_type_t collect_type MUTEST_UNUSED,
-                        va_list args)
+                        va_list *args)
 {
   mutest_expect_res_t *retval = mutest_expect_res_alloc (MUTEST_EXPECT_BOOLEAN);
 
-  int val = va_arg (args, int);
+  int val = va_arg (*args, int);
   retval->expect.v_bool = !!val;
 
   return retval;
@@ -92,7 +92,7 @@ mutest_collect_boolean (mutest_expect_type_t value_type MUTEST_UNUSED,
 static mutest_expect_res_t *
 mutest_collect_number (mutest_expect_type_t value_type,
                        mutest_collect_type_t collect_type,
-                       va_list args)
+                       va_list *args)
 {
   bool collect_int = (collect_type & MUTEST_COLLECT_INT) != 0;
   bool collect_float = (collect_type & MUTEST_COLLECT_FLOAT) != 0;
@@ -136,28 +136,28 @@ mutest_collect_number (mutest_expect_type_t value_type,
       break;
 
     case MUTEST_EXPECT_INT:
-      retval->expect.v_int = va_arg (args, int);
+      retval->expect.v_int = va_arg (*args, int);
       break;
 
     case MUTEST_EXPECT_FLOAT:
-      retval->expect.v_float.value = va_arg (args, double);
+      retval->expect.v_float.value = va_arg (*args, double);
       if (collect_precision)
-        retval->expect.v_float.tolerance = va_arg (args, double);
+        retval->expect.v_float.tolerance = va_arg (*args, double);
       else
         retval->expect.v_float.tolerance = DBL_EPSILON;
       break;
 
     case MUTEST_EXPECT_INT_RANGE:
-      retval->expect.v_irange.min = va_arg (args, int);
-      retval->expect.v_irange.max = va_arg (args, int);
+      retval->expect.v_irange.min = va_arg (*args, int);
+      retval->expect.v_irange.max = va_arg (*args, int);
 
       if (retval->expect.v_irange.min > retval->expect.v_irange.max)
         mutest_assert_if_reached ("invalid range");
       break;
 
     case MUTEST_EXPECT_FLOAT_RANGE:
-      retval->expect.v_frange.min = va_arg (args, double);
-      retval->expect.v_frange.max = va_arg (args, double);
+      retval->expect.v_frange.min = va_arg (*args, double);
+      retval->expect.v_frange.max = va_arg (*args, double);
 
       if (retval->expect.v_frange.min > retval->expect.v_frange.max)
         mutest_assert_if_reached ("invalid range");
@@ -176,11 +176,11 @@ mutest_collect_number (mutest_expect_type_t value_type,
 static mutest_expect_res_t *
 mutest_collect_string (mutest_expect_type_t value_type MUTEST_UNUSED,
                        mutest_collect_type_t collect_type MUTEST_UNUSED,
-                       va_list args)
+                       va_list *args)
 {
   mutest_expect_res_t *retval = mutest_expect_res_alloc (MUTEST_EXPECT_STR);
 
-  char *str = va_arg (args, char *);
+  char *str = va_arg (*args, char *);
   retval->expect.v_str.str = mutest_strdup (str);
   retval->expect.v_str.len = str != NULL ? strlen (str) : 0;
 
@@ -190,11 +190,11 @@ mutest_collect_string (mutest_expect_type_t value_type MUTEST_UNUSED,
 static mutest_expect_res_t *
 mutest_collect_pointer (mutest_expect_type_t value_type MUTEST_UNUSED,
                         mutest_collect_type_t collect_type MUTEST_UNUSED,
-                        va_list args)
+                        va_list *args)
 {
   mutest_expect_res_t *retval = mutest_expect_res_alloc (MUTEST_EXPECT_POINTER);
 
-  retval->expect.v_pointer = va_arg (args, void *);
+  retval->expect.v_pointer = va_arg (*args, void *);
 
   return retval;
 }
@@ -202,7 +202,7 @@ mutest_collect_pointer (mutest_expect_type_t value_type MUTEST_UNUSED,
 static mutest_expect_res_t *
 mutest_collect_scalar (mutest_expect_type_t value_type,
                        mutest_collect_type_t collect_type,
-                       va_list args)
+                       va_list *args)
 {
   bool collect_matching = (collect_type & MUTEST_COLLECT_MATCHING_TYPE) != 0;
   bool collect_string = (collect_type & MUTEST_COLLECT_STRING) != 0;
@@ -394,7 +394,7 @@ mutest_expect_full (const char *file,
               repr = matchers[i].repr;
               check = matchers[i].collector (value->expect_type,
                                              matchers[i].collect_rule,
-                                             args);
+                                             &args);
               break;
             }
         }
