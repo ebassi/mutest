@@ -154,6 +154,7 @@ struct _mutest_spec_t
   int64_t end_time;
 
   bool skip_all;
+  const char *skip_reason;
 };
 
 struct _mutest_suite_t
@@ -171,6 +172,7 @@ struct _mutest_suite_t
   mutest_hook_func_t after_each_hook;
 
   bool skip_all;
+  const char *skip_reason;
 };
 
 #define mutest_oom_abort() \

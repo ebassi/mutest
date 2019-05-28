@@ -103,6 +103,7 @@ mutest_suite_skip (const char *reason)
     mutest_assert_if_reached ("skip called without a suite");
 
   suite->skip_all = true;
+  suite->skip_reason = reason;
 }
 
 void

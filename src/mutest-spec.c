@@ -77,6 +77,7 @@ mutest_spec_skip (const char *reason)
     mutest_assert_if_reached ("skip called without a spec");
 
   spec->skip_all = true;
+  spec->skip_reason = reason;
 }
 
 void
