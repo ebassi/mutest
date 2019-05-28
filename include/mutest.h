@@ -128,6 +128,14 @@ MUTEST_PUBLIC
 mutest_expect_res_t *
 mutest_bool_value (bool value);
 
+/**
+ * mutest_get_bool_value:
+ * @res: a #mutest_expect_res_t
+ *
+ * Retrieves the boolean value in the result wrapper.
+ *
+ * Returns: a boolean value
+ */
 MUTEST_PUBLIC
 bool
 mutest_get_bool_value (const mutest_expect_res_t *res);
@@ -144,6 +152,14 @@ MUTEST_PUBLIC
 mutest_expect_res_t *
 mutest_int_value (int value);
 
+/**
+ * mutest_get_int_value:
+ * @res: a #mutest_expect_res_t
+ *
+ * Retrieves the integer value in the result wrapper.
+ *
+ * Returns: an integer value
+ */
 MUTEST_PUBLIC
 int
 mutest_get_int_value (const mutest_expect_res_t *res);
@@ -160,6 +176,14 @@ MUTEST_PUBLIC
 mutest_expect_res_t *
 mutest_string_value (const char *value);
 
+/**
+ * mutest_get_string_value:
+ * @res: a #mutest_expect_res_t
+ *
+ * Retrieves the string in the result wrapper.
+ *
+ * Returns: a string
+ */
 MUTEST_PUBLIC
 const char *
 mutest_get_string_value (const mutest_expect_res_t *res);
@@ -176,6 +200,14 @@ MUTEST_PUBLIC
 mutest_expect_res_t *
 mutest_float_value (double value);
 
+/**
+ * mutest_get_float_value:
+ * @res: a #mutest_expect_res_t
+ *
+ * Retrieves the floating pointer value in the result wrapper.
+ *
+ * Returns: a floating point value
+ */
 MUTEST_PUBLIC
 double
 mutest_get_float_value (const mutest_expect_res_t *res);
@@ -195,6 +227,14 @@ mutest_expect_res_t *
 mutest_int_range (int min,
                   int max);
 
+/**
+ * mutest_get_int_range:
+ * @res: a #mutest_expect_res_t
+ * @min: return location for the minimum value of the range
+ * @max: return location for the maximum value of the range
+ *
+ * Retrieves the range in the result wrapper.
+ */
 MUTEST_PUBLIC
 void
 mutest_get_int_range (const mutest_expect_res_t *res,
@@ -216,6 +256,14 @@ mutest_expect_res_t *
 mutest_float_range (double min,
                     double max);
 
+/**
+ * mutest_get_float_range:
+ * @res: a #mutest_expect_res_t
+ * @min: return location for the minimum value of the range
+ * @max: return location for the maximum value of the range
+ *
+ * Retrieves the range in the result wrapper.
+ */
 MUTEST_PUBLIC
 void
 mutest_get_float_range (const mutest_expect_res_t *res,
@@ -234,6 +282,14 @@ MUTEST_PUBLIC
 mutest_expect_res_t *
 mutest_pointer (const void *pointer);
 
+/**
+ * mutest_get_pointer:
+ * @res: a #mutest_expect_res_t
+ *
+ * Retrieves the pointer value in the result wrapper.
+ *
+ * Returns: a pointer value
+ */
 MUTEST_PUBLIC
 const void *
 mutest_get_pointer (const mutest_expect_res_t *res);
@@ -279,6 +335,8 @@ mutest_skip (mutest_expect_t *e,
  * Unconditionally checks that the value in @e is true.
  *
  * Returns: true if the value is true
+ *
+ * See also: mutest_to_be()
  */
 MUTEST_PUBLIC
 bool
@@ -293,6 +351,8 @@ mutest_to_be_true (mutest_expect_t *e,
  * Unconditionally checks that the value in @e is false.
  *
  * Returns: true if the value is false
+ *
+ * See also: mutest_to_be()
  */
 MUTEST_PUBLIC
 bool
@@ -307,6 +367,8 @@ mutest_to_be_false (mutest_expect_t *e,
  * Unconditionally checks that the value in @e is %NULL.
  *
  * Returns: true if the value is %NULL
+ *
+ * See also: mutest_to_be()
  */
 MUTEST_PUBLIC
 bool
@@ -466,6 +528,8 @@ mutest_to_be_in_range (mutest_expect_t *e,
  * address as @check.
  *
  * Returns: true if the pointers are identical
+ *
+ * See also: mutest_to_be()
  */
 MUTEST_PUBLIC
 bool
@@ -481,6 +545,8 @@ mutest_to_be_pointer (mutest_expect_t *e,
  * same value as @check.
  *
  * Returns: true if the value is the expected integer value
+ *
+ * See also: mutest_to_be()
  */
 MUTEST_PUBLIC
 bool
@@ -496,6 +562,8 @@ mutest_to_be_int_value (mutest_expect_t *e,
  * bounds of the range in @check.
  *
  * Returns: true if the value is within the range
+ *
+ * See also: mutest_to_be_in_range()
  */
 MUTEST_PUBLIC
 bool
@@ -511,6 +579,8 @@ mutest_to_be_in_int_range (mutest_expect_t *e,
  * same value as @check.
  *
  * Returns: true if the value is the expected floating point value
+ *
+ * See also: mutest_to_be()
  */
 MUTEST_PUBLIC
 bool
@@ -526,6 +596,8 @@ mutest_to_be_float_value (mutest_expect_t *e,
  * the bounds of the range in @check.
  *
  * Returns: true if the value is within the range
+ *
+ * See also: mutest_to_be_in_range()
  */
 MUTEST_PUBLIC
 bool
@@ -541,6 +613,8 @@ mutest_to_be_in_float_range (mutest_expect_t *e,
  * string inside @check.
  *
  * Returns: true if the strings are the same
+ *
+ * See also: mutest_to_be()
  */
 MUTEST_PUBLIC
 bool
@@ -592,6 +666,29 @@ bool
 mutest_to_end_with_string (mutest_expect_t *e,
                            mutest_expect_res_t *check);
 
+/**
+ * mutest_expect_value:
+ * @expect: a #mutest_expect_t
+ *
+ * Retrieves the value associated with the expectation.
+ *
+ * You can use this function to write your custom matchers for
+ * mutest_expect(). For instance:
+ *
+ * ```cpp
+ * static bool
+ * custom_pointer_match (mutest_expect_t *e,
+ *                       mutest_expect_res_t *check)
+ * {
+ *   mutest_expect_res_t *value = mutest_expect_value (e);
+ *
+ *   return mutest_get_pointer (value) == mutest_get_pointer (check);
+ * }
+ * ```
+ *
+ * Returns: the #mutest_expect_res_t used when constructing the
+ *   expectation
+ */
 MUTEST_PUBLIC
 mutest_expect_res_t *
 mutest_expect_value (mutest_expect_t *expect);
@@ -600,10 +697,28 @@ mutest_expect_value (mutest_expect_t *expect);
 
 /* {{{ Main API */
 
+/**
+ * mutest_suite_skip:
+ * @reason: the reason why the suite was skipped
+ *
+ * Skips the current suite.
+ *
+ * You can call this function from within a #mutest_describe_func_t,
+ * or in a #mutest_hook_func_t set with mutest_before().
+ */
 MUTEST_PUBLIC
 void
 mutest_suite_skip (const char *reason);
 
+/**
+ * mutest_spec_skip:
+ * @reason: the reason why the specification was skipped
+ *
+ * Skips the current specification.
+ *
+ * You can call this function from within a #mutest_spec_func_t,
+ * or in a #mutest_hook_func_t set with mutest_before_each().
+ */
 MUTEST_PUBLIC
 void
 mutest_spec_skip (const char *reason);
