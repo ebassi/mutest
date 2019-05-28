@@ -255,6 +255,30 @@ mocha_spec_preamble (mutest_spec_t *spec)
 static void
 mocha_spec_results (mutest_spec_t *spec)
 {
+  if (spec->skip_all)
+    {
+      if (mutest_use_colors ())
+        {
+          mutest_print (stdout,
+                        "    ",
+                        MUTEST_COLOR_YELLOW, "skipped: ",
+                        MUTEST_COLOR_LIGHT_GREY,
+                        spec->skip_reason != NULL ? spec->skip_reason : "unknown",
+                        MUTEST_COLOR_NONE,
+                        NULL);
+        }
+      else
+        {
+          mutest_print (stdout,
+                        "    ",
+                        "skipped: ",
+                        spec->skip_reason != NULL ? spec->skip_reason : "unknown",
+                        NULL);
+        }
+
+      return;
+    }
+
   char passing_s[128], failing_s[128], skipped_s[128];
 
   snprintf (passing_s, 128, "%d passing", spec->pass);
@@ -301,8 +325,31 @@ mocha_spec_results (mutest_spec_t *spec)
 }
 
 static void
-mocha_suite_results (mutest_suite_t *state MUTEST_UNUSED)
+mocha_suite_results (mutest_suite_t *suite)
 {
+  if (suite->skip_all)
+    {
+      if (mutest_use_colors ())
+        {
+          mutest_print (stdout,
+                        "\n",
+                        "  ",
+                        MUTEST_COLOR_YELLOW, "skipped: ",
+                        MUTEST_COLOR_LIGHT_GREY,
+                        suite->skip_reason != NULL ? suite->skip_reason : "unknown",
+                        MUTEST_COLOR_NONE,
+                        NULL);
+        }
+      else
+        {
+          mutest_print (stdout,
+                        "\n",
+                        "  ",
+                        "skipped: ",
+                        suite->skip_reason != NULL ? suite->skip_reason : "unknown",
+                        NULL);
+        }
+    }
 }
 
 static void
