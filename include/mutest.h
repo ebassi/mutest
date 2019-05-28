@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#if __GNUC__ >= 4
+#if defined(__GNUC__) && __GNUC__ >= 4
 # define MUTEST_NULL_TERMINATED \
   __attribute__((__sentinel__))
 #else
