@@ -229,7 +229,7 @@ mutest_report (void)
 {
   global_state.end_time = mutest_get_current_time ();
 
-  mutest_print_totals ();
+  mutest_format_total_results (&global_state);
 
   if (global_state.output_format != MUTEST_OUTPUT_TAP)
     {

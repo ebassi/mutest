@@ -75,7 +75,7 @@ mutest_describe_full (const char *file,
   if (state->before_hook != NULL)
     state->before_hook ();
 
-  mutest_print_suite_preamble (&suite);
+  mutest_format_suite_preamble (&suite);
 
   if (!suite.skip_all)
     {
@@ -91,6 +91,8 @@ mutest_describe_full (const char *file,
 
   if (state->after_hook != NULL)
     state->after_hook ();
+
+  mutest_format_suite_results (&suite);
 
   mutest_set_current_suite (NULL);
 }

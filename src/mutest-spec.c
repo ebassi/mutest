@@ -39,7 +39,7 @@ mutest_it_full (const char *file,
     .skip = 0,
   };
 
-  mutest_print_spec_preamble (&spec);
+  mutest_format_spec_preamble (&spec);
 
   mutest_set_current_spec (&spec);
 
@@ -48,10 +48,12 @@ mutest_it_full (const char *file,
   if (suite->before_each_hook != NULL)
     suite->before_each_hook ();
 
-  spec.start_time = mutest_get_current_time ();
-
   if (!suite->skip_all)
-    func (&spec);
+    {
+      spec.start_time = mutest_get_current_time ();
+      func (&spec);
+      spec.end_time = mutest_get_current_time ();
+    }
   else
     {
       spec.n_tests += 1;
@@ -59,14 +61,12 @@ mutest_it_full (const char *file,
       mutest_add_skip ();
     }
 
-  spec.end_time = mutest_get_current_time ();
-
   if (suite->after_each_hook != NULL)
     suite->after_each_hook ();
 
   mutest_set_current_spec (NULL);
 
-  mutest_print_spec_totals (&spec);
+  mutest_format_spec_results (&spec);
 }
 
 void

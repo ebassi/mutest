@@ -412,7 +412,7 @@ mutest_expect_full (const char *file,
       res = negate ? !res : res;
 
       if (!res)
-        mutest_print_expect_fail (&e, negate, check, repr);
+        mutest_format_expect_fail (&e, negate, check, repr);
 
       if (e.result == MUTEST_RESULT_PASS)
         e.result = res ? MUTEST_RESULT_PASS : MUTEST_RESULT_FAIL;
@@ -426,7 +426,7 @@ mutest_expect_full (const char *file,
 
   mutest_spec_add_result (mutest_get_current_spec (), &e);
 
-  mutest_print_expect (&e);
+  mutest_format_expect_result (&e);
 
   mutest_expect_res_free (value);
 }
