@@ -7,26 +7,32 @@
 
 #include "mutest-private.h"
 
+static int tap_counter;
+
 static void
 tap_expect_result (mutest_expect_t *expect)
 {
+  char buf[64];
+
+  snprintf (buf, 64, "%d", ++tap_counter);
+
   switch (expect->result)
     {
     case MUTEST_RESULT_PASS:
       mutest_print (stdout,
-                    "ok ", expect->description,
+                    "ok ", buf, " - ", expect->description,
                     NULL);
       break;
 
     case MUTEST_RESULT_FAIL:
       mutest_print (stdout,
-                    "not ok ", expect->description,
+                    "not ok ", buf, " - ", expect->description,
                     NULL);
       break;
 
     case MUTEST_RESULT_SKIP:
       mutest_print (stdout,
-                    "ok ", expect->description, " # SKIP",
+                    "ok ", buf, " - ", expect->description, " # SKIP",
                     NULL);
       break;
     }
