@@ -287,6 +287,14 @@ mutest_expect_res_to_string (mutest_expect_res_t *res,
                              size_t len);
 
 void
+mutest_expect_diagnostic (mutest_expect_t *expect,
+                          bool negate,
+                          mutest_expect_res_t *check,
+                          const char *check_repr,
+                          char **diagnostic,
+                          char **location);
+
+void
 mutest_spec_add_expect_result (mutest_spec_t *spec,
                                mutest_expect_t *expect);
 

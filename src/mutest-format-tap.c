@@ -38,54 +38,21 @@ tap_expect_fail (mutest_expect_t *expect,
                  mutest_expect_res_t *check,
                  const char *check_repr)
 {
-  char location[256];
-  snprintf (location, 256, "%s (%s:%d)",
-            expect->func_name,
-            expect->file,
-            expect->line);
-
-  char lhs[256], rhs[256], comparison[16];
-
-  mutest_expect_res_to_string (expect->value, lhs, 256);
-
-  if (check != NULL)
-    {
-      if (check_repr != NULL)
-        snprintf (rhs, 256, "%s", check_repr);
-      else
-        mutest_expect_res_to_string (check, rhs, 256);
-
-      switch (check->expect_type)
-        {
-        case MUTEST_EXPECT_INVALID:
-          snprintf (comparison, 16, " ? ");
-          break;
-        case MUTEST_EXPECT_BOOLEAN:
-        case MUTEST_EXPECT_INT:
-        case MUTEST_EXPECT_STR:
-        case MUTEST_EXPECT_POINTER:
-          snprintf (comparison, 16, " %s ", negate ? "≢" : "≡");
-          break;
-        case MUTEST_EXPECT_FLOAT:
-          snprintf (comparison, 16, " %s ", negate ? "≉" : "≈");
-          break;
-        case MUTEST_EXPECT_INT_RANGE:
-        case MUTEST_EXPECT_FLOAT_RANGE:
-          snprintf (comparison, 16, " %s ", negate ? "∉" : "∈");
-          break;
-        }
-    }
-  else
-    {
-      rhs[0] = '\0';
-      comparison[0] = '\0';
-    }
+  char *diagnostic = NULL;
+  char *location = NULL;
+  mutest_expect_diagnostic (expect, negate, check, check_repr,
+                           &diagnostic,
+                           &location);
 
   mutest_print (stdout,
-                "# Assertion failure: ",
-                lhs, " ", comparison, " ", rhs,
-                " at ", location,
+                "# ",
+                location,
+                ": ",
+                diagnostic,
                 NULL);
+
+  free (diagnostic);
+  free (location);
 }
 
 static void

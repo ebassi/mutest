@@ -179,9 +179,9 @@ mocha_suite_results (mutest_suite_t *suite)
 static void
 mocha_total_results (mutest_state_t *state)
 {
-  int n_tests, total_pass, total_fail, total_skip;
+  int total_pass, total_fail, total_skip;
 
-  n_tests = mutest_get_results (&total_pass, &total_fail, &total_skip);
+  mutest_get_results (&total_pass, &total_fail, &total_skip);
 
   char passing_s[128], failing_s[128], skipped_s[128];
 
@@ -233,67 +233,33 @@ mocha_expect_fail (mutest_expect_t *expect,
                    mutest_expect_res_t *check,
                    const char *check_repr)
 {
-  char location[256];
-  snprintf (location, 256, "%s (%s:%d)",
-            expect->func_name,
-            expect->file,
-            expect->line);
-
-  char lhs[256], rhs[256], comparison[16];
-
-  mutest_expect_res_to_string (expect->value, lhs, 256);
-
-  if (check != NULL)
-    {
-      if (check_repr != NULL)
-        snprintf (rhs, 256, "%s", check_repr);
-      else
-        mutest_expect_res_to_string (check, rhs, 256);
-
-      switch (check->expect_type)
-        {
-        case MUTEST_EXPECT_INVALID:
-          snprintf (comparison, 16, " ? ");
-          break;
-        case MUTEST_EXPECT_BOOLEAN:
-        case MUTEST_EXPECT_INT:
-        case MUTEST_EXPECT_STR:
-        case MUTEST_EXPECT_POINTER:
-          snprintf (comparison, 16, " %s ", negate ? "≢" : "≡");
-          break;
-        case MUTEST_EXPECT_FLOAT:
-          snprintf (comparison, 16, " %s ", negate ? "≉" : "≈");
-          break;
-        case MUTEST_EXPECT_INT_RANGE:
-        case MUTEST_EXPECT_FLOAT_RANGE:
-          snprintf (comparison, 16, " %s ", negate ? "∉" : "∈");
-          break;
-        }
-    }
-  else
-    {
-      rhs[0] = '\0';
-      comparison[0] = '\0';
-    }
+  char *diagnostic = NULL;
+  char *location = NULL;
+  mutest_expect_diagnostic (expect, negate, check, check_repr,
+                            &diagnostic,
+                            &location);
 
   if (mutest_use_colors ())
     {
       mutest_print (stdout,
                     "      ",
-                    MUTEST_COLOR_RED, "Assertion failure: ",
-                    lhs, comparison, rhs,
-                    " at ", location, MUTEST_COLOR_NONE,
+                    MUTEST_COLOR_RED,
+                    "Assertion failure: ", diagnostic,
+                    " at ", location,
+                    MUTEST_COLOR_NONE,
                     NULL);
     }
   else
     {
       mutest_print (stdout,
                     "      ",
-                    "Assertion failure: ",
-                    lhs, " ", comparison, " ", rhs,
+                    "Assertion failure: ", diagnostic,
                     " at ", location,
                     NULL);
     }
+
+  free (diagnostic);
+  free (location);
 }
 
 const mutest_formatter_t *

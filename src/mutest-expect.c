@@ -439,3 +439,74 @@ mutest_expect_value (mutest_expect_t *e)
 
   return e->value;
 }
+
+void
+mutest_expect_diagnostic (mutest_expect_t *expect,
+                          bool negate,
+                          mutest_expect_res_t *check,
+                          const char *check_repr,
+                          char **diagnostic_p,
+                          char **location_p)
+{
+  char location[256];
+  snprintf (location, 256, "%s (%s:%d)",
+            expect->func_name,
+            expect->file,
+            expect->line);
+
+  char lhs[256], rhs[256], comparison[16];
+
+  mutest_expect_res_to_string (expect->value, lhs, 256);
+
+  if (check != NULL)
+    {
+      if (check_repr != NULL)
+        snprintf (rhs, 256, "%s", check_repr);
+      else
+        mutest_expect_res_to_string (check, rhs, 256);
+
+      switch (check->expect_type)
+        {
+        case MUTEST_EXPECT_INVALID:
+          snprintf (comparison, 16, " ? ");
+          break;
+        case MUTEST_EXPECT_BOOLEAN:
+        case MUTEST_EXPECT_INT:
+        case MUTEST_EXPECT_STR:
+        case MUTEST_EXPECT_POINTER:
+          snprintf (comparison, 16, " %s ", negate ? "≢" : "≡");
+          break;
+        case MUTEST_EXPECT_FLOAT:
+          snprintf (comparison, 16, " %s ", negate ? "≉" : "≈");
+          break;
+        case MUTEST_EXPECT_INT_RANGE:
+        case MUTEST_EXPECT_FLOAT_RANGE:
+          snprintf (comparison, 16, " %s ", negate ? "∉" : "∈");
+          break;
+        }
+    }
+  else
+    {
+      rhs[0] = '\0';
+      comparison[0] = '\0';
+    }
+
+  if (diagnostic_p != NULL)
+    {
+      size_t lhs_len = strlen (lhs);
+      size_t cmp_len = strlen (comparison);
+      size_t rhs_len = strlen (rhs);
+      size_t diagnostic_len = lhs_len + 1 + cmp_len + 1 + rhs_len;
+
+      *diagnostic_p = malloc (sizeof (char) * diagnostic_len + 1);
+      snprintf (*diagnostic_p, diagnostic_len + 1, "%s %s %s", lhs, comparison, rhs);
+    }
+
+  if (location_p != NULL)
+    {
+      size_t loc_len = strlen (location);
+
+      *location_p = malloc (sizeof (char) * loc_len + 1);
+      snprintf (*location_p, loc_len + 1, "%s", location);
+    }
+}
