@@ -73,10 +73,11 @@ typedef struct {
   mutest_suite_t *current_suite;
   mutest_spec_t *current_spec;
 
-  int n_tests;
-  int pass;
-  int fail;
-  int skip;
+  int n_suites;
+  int total_tests;
+  int total_pass;
+  int total_fail;
+  int total_skip;
 
   int64_t start_time;
   int64_t end_time;
@@ -158,7 +159,7 @@ struct _mutest_spec_t
 
   const char *description;
 
-  int n_tests;
+  int n_expects;
   int pass;
   int fail;
   int skip;
@@ -183,6 +184,11 @@ struct _mutest_suite_t
 
   mutest_hook_func_t before_each_hook;
   mutest_hook_func_t after_each_hook;
+
+  int n_specs;
+  int pass;
+  int fail;
+  int skip;
 
   bool skip_all;
   const char *skip_reason;
@@ -276,22 +282,25 @@ mutest_format_time (int64_t t,
                     const char **unit);
 
 void
-mutest_add_pass (void);
-
-void
-mutest_add_fail (void);
-
-void
-mutest_add_skip (void);
-
-void
 mutest_expect_res_to_string (mutest_expect_res_t *res,
                              char *buf,
                              size_t len);
 
 void
-mutest_spec_add_result (mutest_spec_t *spec,
-                        mutest_expect_t *expect);
+mutest_spec_add_expect_result (mutest_spec_t *spec,
+                               mutest_expect_t *expect);
+
+void
+mutest_suite_add_spec_results (mutest_suite_t *suite,
+                               mutest_spec_t *spec);
+
+void
+mutest_add_suite_results (mutest_suite_t *suite);
+
+int
+mutest_get_results (int *total_pass,
+                    int *total_fail,
+                    int *total_skip);
 
 void
 mutest_format_suite_preamble (mutest_suite_t *suite);

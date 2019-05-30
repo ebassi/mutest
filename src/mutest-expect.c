@@ -424,7 +424,7 @@ mutest_expect_full (const char *file,
 
   va_end (args);
 
-  mutest_spec_add_result (mutest_get_current_spec (), &e);
+  mutest_spec_add_expect_result (mutest_get_current_spec (), &e);
 
   mutest_format_expect_result (&e);
 

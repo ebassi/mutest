@@ -77,17 +77,21 @@ mutest_describe_full (const char *file,
 
   mutest_format_suite_preamble (&suite);
 
-  if (!suite.skip_all)
+  if (suite.skip_all)
+    {
+      state->total_skip += 1;
+    }
+  else
     {
       suite.start_time = mutest_get_current_time ();
       func (&suite);
       suite.end_time = mutest_get_current_time ();
+
+      if (suite.skip_all)
+        state->total_skip += 1;
     }
-  else
-    {
-      state->n_tests += 1;
-      state->skip += 1;
-    }
+
+  mutest_add_suite_results (&suite);
 
   if (state->after_hook != NULL)
     state->after_hook ();
@@ -95,6 +99,17 @@ mutest_describe_full (const char *file,
   mutest_format_suite_results (&suite);
 
   mutest_set_current_suite (NULL);
+}
+
+void
+mutest_suite_add_spec_results (mutest_suite_t *suite,
+                               mutest_spec_t *spec)
+{
+  suite->n_specs += 1;
+
+  suite->pass += spec->pass;
+  suite->fail += spec->fail;
+  suite->skip += spec->skip;
 }
 
 void

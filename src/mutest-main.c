@@ -34,10 +34,10 @@ static mutest_state_t global_state = {
   .current_suite = NULL,
   .current_spec = NULL,
 
-  .n_tests = 0,
-  .pass = 0,
-  .fail = 0,
-  .skip = 0,
+  .n_suites = 0,
+  .total_pass = 0,
+  .total_fail = 0,
+  .total_skip = 0,
 
   .start_time = 0,
   .end_time = 0,
@@ -104,24 +104,32 @@ mutest_set_current_spec (mutest_spec_t *spec)
 }
 
 void
-mutest_add_pass (void)
+mutest_add_suite_results (mutest_suite_t *suite)
 {
-  global_state.n_tests += 1;
-  global_state.pass += 1;
+  global_state.n_suites += 1;
+
+  global_state.total_pass += suite->pass;
+  global_state.total_fail += suite->fail;
+  global_state.total_skip += suite->skip;
 }
 
-void
-mutest_add_fail (void)
+int
+mutest_get_results (int *total_pass,
+                    int *total_fail,
+                    int *total_skip)
 {
-  global_state.n_tests += 1;
-  global_state.fail += 1;
-}
+  int total = global_state.total_pass
+            + global_state.total_fail
+            + global_state.total_skip;
 
-void
-mutest_add_skip (void)
-{
-  global_state.n_tests += 1;
-  global_state.skip += 1;
+  if (total_pass != NULL)
+    *total_pass = global_state.total_pass;
+  if (total_fail != NULL)
+    *total_fail = global_state.total_fail;
+  if (total_skip != NULL)
+    *total_skip = global_state.total_skip;
+
+  return total;
 }
 
 static void
@@ -231,14 +239,18 @@ mutest_report (void)
 
   mutest_format_total_results (&global_state);
 
+  int n_tests, n_skipped, n_failed;
+
+  n_tests = mutest_get_results (NULL, &n_failed, &n_skipped);
+
   if (global_state.output_format != MUTEST_OUTPUT_TAP)
     {
       /* The Autotools test harness uses the 77 exit code to signify
        * that all tests have been skipped
        */
-      if (global_state.n_tests == global_state.skip)
+      if (n_tests == n_skipped)
         return 77;
     }
 
-  return global_state.fail == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+  return n_failed == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }

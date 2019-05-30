@@ -179,11 +179,15 @@ mocha_suite_results (mutest_suite_t *suite)
 static void
 mocha_total_results (mutest_state_t *state)
 {
+  int n_tests, total_pass, total_fail, total_skip;
+
+  n_tests = mutest_get_results (&total_pass, &total_fail, &total_skip);
+
   char passing_s[128], failing_s[128], skipped_s[128];
 
-  snprintf (passing_s, 128, "%d passing", state->pass);
-  snprintf (failing_s, 128, "%d failing", state->fail);
-  snprintf (skipped_s, 128, "%d skipped", state->skip);
+  snprintf (passing_s, 128, "%d passing", total_pass);
+  snprintf (failing_s, 128, "%d failing", total_fail);
+  snprintf (skipped_s, 128, "%d skipped", total_skip);
 
   const char *delta_u;
   double delta_t;
@@ -201,12 +205,12 @@ mocha_total_results (mutest_state_t *state)
                       MUTEST_COLOR_LIGHT_GREY, delta_s, MUTEST_COLOR_NONE,
                     NULL);
 
-      if (state->skip != 0)
+      if (total_skip != 0)
         mutest_print (stdout,
                       MUTEST_COLOR_YELLOW, skipped_s, MUTEST_COLOR_NONE,
                       NULL);
 
-      if (state->fail != 0)
+      if (total_fail != 0)
         mutest_print (stdout,
                       MUTEST_COLOR_RED, failing_s, MUTEST_COLOR_NONE,
                       NULL);
