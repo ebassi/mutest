@@ -482,12 +482,7 @@ mutest_expect_diagnostic (mutest_expect_t *expect,
 
   if (check != NULL)
     {
-      if (check_repr != NULL)
-        snprintf (rhs, 256, "%s", check_repr);
-      else
-        mutest_expect_res_to_string (check, rhs, 256);
-
-      switch (check->expect_type)
+      switch (expect->value->expect_type)
         {
         case MUTEST_EXPECT_INVALID:
           snprintf (comparison, 16, " ? ");
@@ -503,9 +498,14 @@ mutest_expect_diagnostic (mutest_expect_t *expect,
           break;
         case MUTEST_EXPECT_INT_RANGE:
         case MUTEST_EXPECT_FLOAT_RANGE:
-          snprintf (comparison, 16, " %s ", negate ? "∉" : "∈");
+          snprintf (comparison, 16, " %s ", negate ? "∌" : "∋");
           break;
         }
+
+      if (check_repr != NULL)
+        snprintf (rhs, 256, "%s", check_repr);
+      else
+        mutest_expect_res_to_string (check, rhs, 256);
     }
   else
     {
