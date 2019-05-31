@@ -111,7 +111,7 @@ mutest_to_be_close_to (mutest_expect_t *e,
                        mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Matches whether the value in `e` is within a given tolerance of the value
+Checks whether the value in `e` is within a given tolerance of the value
 wrapped by `check`.
 
 e
@@ -129,6 +129,8 @@ mutest_to_be_nan (mutest_expect_t *e,
                   mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Checks whether the floating point value in `e` is NaN (Not a Number).
+
 e
 : the expectation object
 check
@@ -143,6 +145,8 @@ bool
 mutest_to_be_positive_infinity (mutest_expect_t *e,
                                 mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Checks whether the floating point value in `e` is a positive infinity.
 
 e
 : the expectation object
@@ -159,6 +163,8 @@ mutest_to_be_negative_infinity (mutest_expect_t *e,
                                 mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Checks whether the floating point value in `e` is a negative infinity.
+
 e
 : the expectation object
 check
@@ -173,6 +179,8 @@ bool
 mutest_to_be_greater_than (mutest_expect_t *e,
                            mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Checks whether the numeric value in `e` is greater than the value in `check`.
 
 e
 : the expectation object
@@ -189,6 +197,9 @@ mutest_to_be_greater_than_or_equal (mutest_expect_t *e,
                                     mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Checks whether the numeric value in `e` is greater than, or equal to
+the value in `check`.
+
 e
 : the expectation object
 check
@@ -203,6 +214,9 @@ bool
 mutest_to_be_less_than_or_equal (mutest_expect_t *e,
                                  mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Checks whether the numeric value in `e` is less than, or equal to
+the value in `check`.
 
 e
 : the expectation object
@@ -219,6 +233,8 @@ mutest_to_be_less_than (mutest_expect_t *e,
                         mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Checks whether the numeric value in `e` is less than the value in `check`.
+
 e
 : the expectation object
 check
@@ -234,6 +250,8 @@ mutest_to_be_in_range (mutest_expect_t *e,
                        mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Checks if the numeric value in `e` is inside the range in `check`.
+
 e
 : the expectation object
 check
@@ -245,9 +263,12 @@ return value
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
-mutest_to_contain_string (mutest_expect_t *e,
-                          mutest_expect_res_t *check);
+mutest_to_contain (mutest_expect_t *e,
+                   mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Checks if the numeric range, or string, in `e` contains the numeric
+value, or string, in `check`.
 
 e
 : the expectation object
@@ -264,6 +285,8 @@ mutest_to_start_with_string (mutest_expect_t *e,
                              mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Checks that the string in `e` starts with the string in `check`.
+
 e
 : the expectation object
 check
@@ -279,6 +302,8 @@ mutest_to_end_with_string (mutest_expect_t *e,
                            mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Checks that the string in `e` ends with the string in `check`.
+
 e
 : the expectation object
 check
@@ -286,10 +311,104 @@ check
 return value
 : `true` if the matcher is satisfied, and `false` otherwise
 
-### Types
+----
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
+mutest_to_be_true (mutest_expect_t *e,
+                   mutest_expect_res_t *check);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Checks that the boolean value in `e` is true.
+
+e
+: the expectation object
+check
+: the matcher argument
+return value
+: `true` if the matcher is satisfied, and `false` otherwise
+
+----
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bool
+mutest_to_be_false (mutest_expect_t *e,
+                    mutest_expect_res_t *check);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Checks that the boolean value in `e` is false.
+
+e
+: the expectation object
+check
+: the matcher argument
+return value
+: `true` if the matcher is satisfied, and `false` otherwise
+
+----
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bool
+mutest_to_be_null (mutest_expect_t *e,
+                   mutest_expect_res_t *check);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Checks that the pointer value in `e` is `NULL`.
+
+e
+: the expectation object
+check
+: the matcher argument
+return value
+: `true` if the matcher is satisfied, and `false` otherwise
+
+----
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mutest_expect_res_t *
+mutest_expect_value (mutest_expect_t *expect);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Retrieves the pointer to the value wrapper passed to `mutest_expect()` from
+the `mutest_expect_t` object.
+
+This function is typically used when implementing custom matchers. For
+instance:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+static bool
+test_my_object_is_equal (mutest_expect_t *e,
+                         mutest_expect_res_t *check)
+{
+  mutest_expect_res_t *value = mutest_expect_value (e);
+
+  MyObject *a = mutest_get_pointer (value);
+  MyObject *b = mutest_get_pointer (check);
+
+  // Simple equality
+  if (a == b)
+    return true;
+
+  // my_object_deep_equal() is defined elsewhere as a deep
+  // equality of two MyObject instances
+  return my_object_deep_equal (a, b);
+}
+
+...
+
+  // Custom matchers must use the explicit value wrappers,
+  // as µTest doesn't know how to collect the values
+  mutest_expect ("the objects to be equal",
+                 mutest_pointer (foo),
+                 test_my_object_is_equal, mutest_pointer (bar),
+                 NULL);
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Types
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+typedef bool
 (* mutest_matcher_func_t) (mutest_expect_t *e,
                            mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
