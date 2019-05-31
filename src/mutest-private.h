@@ -112,7 +112,10 @@ struct _mutest_expect_res_t
   union {
     bool v_bool;
 
-    int v_int;
+    struct {
+      int value;
+      int tolerance;
+    } v_int;
 
     struct {
       int min;

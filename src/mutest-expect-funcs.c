@@ -132,7 +132,7 @@ mutest_to_be_true (mutest_expect_t *e,
     return value->expect.v_bool;
 
   if (value->expect_type == MUTEST_EXPECT_INT)
-    return value->expect.v_int != 0;
+    return value->expect.v_int.value != 0;
 
   return false;
 }
@@ -147,7 +147,7 @@ mutest_to_be_false (mutest_expect_t *e,
     return !value->expect.v_bool;
 
   if (value->expect_type == MUTEST_EXPECT_INT)
-    return value->expect.v_int == 0;
+    return value->expect.v_int.value == 0;
 
   return false;
 }
@@ -182,7 +182,7 @@ mutest_to_be_greater_than (mutest_expect_t *e,
   mutest_expect_res_t *value = e->value;
 
   if (value->expect_type == MUTEST_EXPECT_INT && check->expect_type == MUTEST_EXPECT_INT)
-    return value->expect.v_int > check->expect.v_int;
+    return value->expect.v_int.value > check->expect.v_int.value;
 
   if (value->expect_type == MUTEST_EXPECT_FLOAT && check->expect_type == MUTEST_EXPECT_FLOAT)
     return value->expect.v_float.value > check->expect.v_float.value;
@@ -197,7 +197,7 @@ mutest_to_be_greater_than_or_equal (mutest_expect_t *e,
   mutest_expect_res_t *value = e->value;
 
   if (value->expect_type == MUTEST_EXPECT_INT && check->expect_type == MUTEST_EXPECT_INT)
-    return value->expect.v_int >= check->expect.v_int;
+    return value->expect.v_int.value >= check->expect.v_int.value;
 
   if (value->expect_type == MUTEST_EXPECT_FLOAT && check->expect_type == MUTEST_EXPECT_FLOAT)
     return value->expect.v_float.value >= check->expect.v_float.value;
@@ -212,7 +212,7 @@ mutest_to_be_less_than_or_equal (mutest_expect_t *e,
   mutest_expect_res_t *value = e->value;
 
   if (value->expect_type == MUTEST_EXPECT_INT && check->expect_type == MUTEST_EXPECT_INT)
-    return value->expect.v_int <= check->expect.v_int;
+    return value->expect.v_int.value <= check->expect.v_int.value;
 
   if (value->expect_type == MUTEST_EXPECT_FLOAT && check->expect_type == MUTEST_EXPECT_FLOAT)
     return value->expect.v_float.value <= check->expect.v_float.value;
@@ -227,7 +227,7 @@ mutest_to_be_less_than (mutest_expect_t *e,
   mutest_expect_res_t *value = e->value;
 
   if (value->expect_type == MUTEST_EXPECT_INT && check->expect_type == MUTEST_EXPECT_INT)
-    return value->expect.v_int < check->expect.v_int;
+    return value->expect.v_int.value < check->expect.v_int.value;
 
   if (value->expect_type == MUTEST_EXPECT_FLOAT && check->expect_type == MUTEST_EXPECT_FLOAT)
     return value->expect.v_float.value < check->expect.v_float.value;
@@ -256,7 +256,7 @@ mutest_to_be_int_value (mutest_expect_t *e,
 {
   if (e->value->expect_type == MUTEST_EXPECT_INT &&
       check->expect_type == MUTEST_EXPECT_INT)
-    return e->value->expect.v_int == check->expect.v_int;
+    return e->value->expect.v_int.value == check->expect.v_int.value;
 
   return false;
 }
@@ -268,8 +268,8 @@ mutest_to_be_in_int_range (mutest_expect_t *e,
   if (e->value->expect_type == MUTEST_EXPECT_INT &&
       check->expect_type == MUTEST_EXPECT_INT_RANGE)
     {
-      if (e->value->expect.v_int >= check->expect.v_irange.min &&
-          e->value->expect.v_int <= check->expect.v_irange.max)
+      if (e->value->expect.v_int.value >= check->expect.v_irange.min &&
+          e->value->expect.v_int.value <= check->expect.v_irange.max)
         return true;
     }
 

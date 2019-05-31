@@ -136,7 +136,11 @@ mutest_collect_number (mutest_expect_type_t value_type,
       break;
 
     case MUTEST_EXPECT_INT:
-      retval->expect.v_int = va_arg (*args, int);
+      retval->expect.v_int.value = va_arg (*args, int);
+      if (collect_precision)
+        retval->expect.v_int.tolerance = va_arg (*args, int);
+      else
+        retval->expect.v_int.tolerance = 0;
       break;
 
     case MUTEST_EXPECT_FLOAT:
