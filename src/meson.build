@@ -1,10 +1,10 @@
 sources = [
   'mutest-expect.c',
-  'mutest-expect-funcs.c',
   'mutest-expect-types.c',
   'mutest-format-mocha.c',
   'mutest-format-tap.c',
   'mutest-main.c',
+  'mutest-matchers.c',
   'mutest-spec.c',
   'mutest-suite.c',
   'mutest-utils.c',
