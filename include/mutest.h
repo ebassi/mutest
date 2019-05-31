@@ -520,6 +520,21 @@ mutest_to_be_in_range (mutest_expect_t *e,
                        mutest_expect_res_t *check);
 
 /**
+ * mutest_to_contain:
+ * @e: a #mutest_expect_t
+ * @check: a #mutest_expect_res_t
+ *
+ * Checks if the numeric range, or string, in @e contains the numeric
+ * value, or string, in @check.
+ *
+ * Returns: true if the range or string contains the expected value
+ */
+MUTEST_PUBLIC
+bool
+mutest_to_contain (mutest_expect_t *e,
+                   mutest_expect_res_t *check);
+
+/**
  * mutest_to_be_pointer:
  * @e: a #mutest_expect_t
  * @check: a #mutest_expect_res_t

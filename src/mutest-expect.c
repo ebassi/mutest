@@ -226,6 +226,19 @@ mutest_collect_scalar (mutest_expect_type_t value_type,
       (value_type == MUTEST_EXPECT_FLOAT && collect_float))
     return mutest_collect_number (value_type, collect_type, args);
 
+  if ((value_type == MUTEST_EXPECT_INT_RANGE && collect_int) ||
+      (value_type == MUTEST_EXPECT_FLOAT_RANGE && collect_float))
+    {
+      /* We're collecting a scalar from a range, so we need to override
+       * the collection flags and force a type
+       */
+      if (value_type == MUTEST_EXPECT_INT_RANGE)
+        collect_type = MUTEST_COLLECT_INT;
+      else if (value_type == MUTEST_EXPECT_FLOAT_RANGE)
+        collect_type = MUTEST_COLLECT_FLOAT;
+      return mutest_collect_number (value_type, collect_type, args);
+    }
+
   if (value_type == MUTEST_EXPECT_STR && collect_string)
     return mutest_collect_string (value_type, collect_type, args);
 
@@ -300,6 +313,11 @@ static const struct {
 
   /* Generic scalar matcher */
   { mutest_to_be,
+    MUTEST_COLLECT_SCALAR | MUTEST_COLLECT_MATCHING_TYPE,
+    mutest_collect_scalar,
+    NULL,
+  },
+  { mutest_to_contain,
     MUTEST_COLLECT_SCALAR | MUTEST_COLLECT_MATCHING_TYPE,
     mutest_collect_scalar,
     NULL,

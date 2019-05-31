@@ -337,6 +337,45 @@ mutest_to_be_string (mutest_expect_t *e,
 }
 
 bool
+mutest_to_contain (mutest_expect_t *e,
+                   mutest_expect_res_t *check)
+{
+  mutest_expect_res_t *value = e->value;
+
+  if (value->expect_type == MUTEST_EXPECT_INT_RANGE &&
+      check->expect_type == MUTEST_EXPECT_INT)
+    {
+      if (check->expect.v_int.value >= value->expect.v_irange.min &&
+          check->expect.v_int.value <= value->expect.v_irange.max)
+        return true;
+
+      return false;
+    }
+
+  if (value->expect_type == MUTEST_EXPECT_FLOAT_RANGE &&
+      check->expect_type == MUTEST_EXPECT_FLOAT)
+    {
+      if (check->expect.v_float.value >= value->expect.v_frange.min &&
+          check->expect.v_float.value <= value->expect.v_frange.max)
+        return true;
+
+      return false;
+    }
+
+  if (value->expect_type == MUTEST_EXPECT_STR &&
+      check->expect_type == MUTEST_EXPECT_STR)
+    {
+      if (value->expect.v_str.len < check->expect.v_str.len)
+        return false;
+
+      if (strstr (value->expect.v_str.str, check->expect.v_str.str) != NULL)
+        return true;
+    }
+
+  return false;
+}
+
+bool
 mutest_to_contain_string (mutest_expect_t *e,
                           mutest_expect_res_t *check)
 {
