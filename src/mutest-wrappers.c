@@ -1,4 +1,4 @@
-/* mutest-expect-types.c: Result types
+/* mutest-wrappers.c: Value wrappers
  *
  * µTest - Copyright 2019  Emmanuele Bassi
  *

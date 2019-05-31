@@ -1,4 +1,4 @@
-/* mutest-expect-funcs.c: Comparators
+/* mutest-matchers.c: Matching functions
  *
  * µTest - Copyright 2019  Emmanuele Bassi
  *
