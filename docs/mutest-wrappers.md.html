@@ -1,0 +1,53 @@
+<meta charset="utf-8"><link rel="stylesheet" href="apidoc.css"/>
+
+**µTest — A small C testing library**
+
+ * [Main](./mutest.md.html)
+
+## Value Wrappers
+
+### Includes
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#include <mutest.h>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Functions
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mutest_expect_res_t *
+mutest_bool_value (bool value);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Wraps a boolean value to pass to `mutest_expect()`.
+
+value
+: a boolean scalar
+return value
+: a newly allocated `mutest_expect_res_t`
+
+----
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bool
+mutest_get_bool_value (const mutest_expect_res_t *res);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+----
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mutest_expect_res_t *
+mutest_int_value (int value);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+----
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mutest_expect_res_t *
+mutest_string_value (const char *value);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+----
+
+<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'none'};</script>
+<!-- Markdeep: --><script src="markdeep.min.js" charset="utf-8"></script>
