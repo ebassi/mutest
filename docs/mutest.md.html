@@ -1,0 +1,67 @@
+<meta charset="utf-8"><link rel="stylesheet" href="apidoc.css"/>
+
+**µTest — A small C testing library**
+
+## What is µTest?
+
+µTest aims to be a small unit testing library for C projects, with an API
+heavily modelled on high level Behavior-Driven Development frameworks like
+[Jasmine][jasmine] or [Mocha][mocha].
+
+[jasmine]: https://jasmine.github.io/
+[mocha]: https://mochajs.org/
+
+## Using µTest in your project
+
+The preferred way to use µTest is to include it in your own projects using
+a Git sub-module, and then building µTest as a static library. If you are
+using [Meson](http://mesonbuild.com), you can use a wrap file in the
+`subprojects` directory:
+
+```
+[wrap-git]
+directory=mutest
+url=https://github.com/ebassi/mutest.git
+revision=master
+```
+
+and then use the `fallback` dependency type:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mutest_dep = dependency('mutest-1',
+  fallback: [ 'mutest', 'mutest_dep' ],
+  default_options: ['static=true'],
+  required: false,
+  disabler: true,
+)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The `static` option will build µTest as an uninstalled static library.
+
+µTest can also build a shared library and a [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/)
+file to describe the necessary compiler and linker flags, if you want to
+install µTest in your library path; if you decide to depend on the shared
+library, you can use the normal `pkg-config`-based dependency discovery.
+For instance, if you are using [Meson](http://mesonbuild.com):
+
+```meson
+mutest_dep = dependency('mutest-1')
+```
+
+And if you're using Autotools:
+
+```m4
+PKG_CHECK_MODULES(MUTEST, [mutest-1])
+AC_SUBST(MUTEST_CFLAGS)
+AC_SUBST(MUTEST_LIBS)
+```
+
+## API Reference
+
+ - [General](./mutest-general.md.html)
+ - [Matchers](./mutest-matchers.md.html)
+ - [Value wrappers](./mutest-wrappers.md.html)
+ - [Hooks](./mutest-hooks.md.html)
+
+<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'none'};</script>
+<!-- Markdeep: --><script src="markdeep.min.js" charset="utf-8"></script>

@@ -6,7 +6,7 @@ check_scalars (mutest_spec_t *spec MUTEST_UNUSED)
   mutest_expect ("booleans",
                  mutest_bool_value (true),
                  mutest_to_be, true,
-                 mutest_not, mutest_to_be_false,
+                 mutest_not, mutest_to_be, false,
                  NULL);
   mutest_expect ("integer values",
                  mutest_int_value (42),
@@ -23,7 +23,7 @@ check_scalars (mutest_spec_t *spec MUTEST_UNUSED)
 
   mutest_expect ("pointers",
                  mutest_pointer (p),
-                 mutest_not, mutest_to_be_null,
+                 mutest_not, mutest_to_be, NULL,
                  mutest_to_be, (void *) 0xdeadbeef,
                  NULL);
 }
@@ -58,6 +58,23 @@ check_ranges (mutest_spec_t *spec MUTEST_UNUSED)
                  mutest_float_value (3.14),
                  mutest_to_be_in_range, 3.0, 4.0,
                  NULL);
+
+  mutest_expect ("contains to work on integer ranges",
+                 mutest_int_range (40, 45),
+                 mutest_to_contain, 42,
+                 mutest_to_contain, 40,
+                 mutest_to_contain, 45,
+                 mutest_not, mutest_to_contain, 30,
+                 mutest_not, mutest_to_contain, 50,
+                 NULL);
+
+  mutest_expect ("contains to work on float ranges",
+                 mutest_float_range (0.0, 1.0),
+                 mutest_to_contain, 0.0,
+                 mutest_to_contain, 1.0,
+                 mutest_to_contain, 0.5,
+                 mutest_not, mutest_to_contain, 2.0,
+                 NULL);
 }
 
 static void
@@ -69,7 +86,7 @@ check_string (mutest_spec_t *spec MUTEST_UNUSED)
                  NULL);
   mutest_expect ("substring",
                  mutest_string_value ("hello, world"),
-                 mutest_to_contain_string, "o, w",
+                 mutest_to_contain, "o, w",
                  NULL);
   mutest_expect ("string prefix",
                  mutest_string_value ("hello, world"),

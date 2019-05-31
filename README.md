@@ -1,8 +1,7 @@
 ## µTest - A small C testing library
 
-**Linux**: [![Build Status](https://travis-ci.org/ebassi/mutest.svg?branch=master)](https://travis-ci.org/ebassi/mutest)
-
-**Windows**: ...
+ - **Linux**: [![Build Status](https://travis-ci.org/ebassi/mutest.svg?branch=master)](https://travis-ci.org/ebassi/mutest)
+ - **Windows**: [![Build status](https://ci.appveyor.com/api/projects/status/1ghtdpt42u3vy8s9/branch/master?svg=true)](https://ci.appveyor.com/project/ebassi/mutest/branch/master)
 
 µTest aims to be a small unit testing library for C projects, with an API
 heavily modelled on high level frameworks like Jasmine or Mocha.
@@ -21,7 +20,7 @@ $ meson _build .
 $ cd _build
 $ ninja
 $ meson test
-$ ninja install
+$ sudo ninja install
 ```
 
 ## Using µTest
@@ -45,7 +44,7 @@ AC_SUBST(MUTEST_LIBS)
 ```
 
 You can also depend on µTest as a subproject in existing Meson-based
-projects through a wrap file:
+projects through a wrap file and a Git sub-module:
 
 ```sh
 $ cat >subprojects/mutest.wrap <<HERE
@@ -59,7 +58,12 @@ $ cat >subprojects/mutest.wrap <<HERE
 And using the `fallback` option in your Meson build:
 
 ```meson
-mutest_dep = dependency('mutest-1', fallback: [ 'mutest', 'mutest_dep' ])
+mutest_dep = dependency('mutest-1',
+  fallback: [ 'mutest', 'mutest_dep' ],
+  default_options: ['static=true'],
+  required: false,
+  disabler: true,
+)
 ```
 
 The sub-project route is strongly encouraged.
@@ -113,11 +117,11 @@ general_spec (mutest_spec_t *spec)
 
   mutest_expect ("a is true",
                  mutest_bool_value (a),
-                 mutest_to_be_true,
+                 mutest_to_be, true,
                  NULL);
   mutest_expect ("a is not false",
                  mutest_bool_value (a),
-                 mutest_not, mutest_to_be_false,
+                 mutest_not, mutest_to_be, false,
                  NULL);
 }
 ```
@@ -175,14 +179,14 @@ in your test environment:
 MUTEST_OUTPUT=tap ./tests/general
 # General
 # contains at least a spec with an expectation
-ok 1 a is true
-ok 2 a is not false
+ok 1 - a is true
+ok 2 - a is not false
 # can contain multiple specs
-ok 3 str contains 'hello'
-ok 4 str contains 'world'
-ok 5 contains all fragments
+ok 3 - str contains 'hello'
+ok 4 - str contains 'world'
+ok 5 - contains all fragments
 # should be skipped
-ok 6 # skip: skip this test
+ok 6 - skip this test # SKIP
 1..6
 ```
 

@@ -33,13 +33,13 @@ mutest_it_full (const char *file,
     .line = line,
     .func_name = func_name,
     .skip_all = false,
-    .n_tests = 0,
+    .n_expects = 0,
     .pass = 0,
     .fail = 0,
     .skip = 0,
   };
 
-  mutest_print_spec_preamble (&spec);
+  mutest_format_spec_preamble (&spec);
 
   mutest_set_current_spec (&spec);
 
@@ -48,25 +48,39 @@ mutest_it_full (const char *file,
   if (suite->before_each_hook != NULL)
     suite->before_each_hook ();
 
-  spec.start_time = mutest_get_current_time ();
-
-  if (!suite->skip_all)
-    func (&spec);
+  /* If mutest_spec_skip() was called inside the before_each() hook,
+   * then we don't call func(), and mark the whole spec as skipped
+   */
+  if (spec.skip_all)
+    {
+      spec.n_expects = 1;
+      spec.skip = 1;
+    }
   else
     {
-      spec.n_tests += 1;
-      spec.skip += 1;
-      mutest_add_skip ();
+      spec.start_time = mutest_get_current_time ();
+      func (&spec);
+      spec.end_time = mutest_get_current_time ();
+
+      /* If mutest_spec_skip() was called in func() then we mark the
+       * whole spec as skipped regardless of how many expectations
+       * were actually ran
+       */
+      if (spec.skip_all)
+        {
+          spec.n_expects = 1;
+          spec.skip = 1;
+        }
     }
 
-  spec.end_time = mutest_get_current_time ();
+  mutest_suite_add_spec_results (suite, &spec);
 
   if (suite->after_each_hook != NULL)
     suite->after_each_hook ();
 
   mutest_set_current_spec (NULL);
 
-  mutest_print_spec_totals (&spec);
+  mutest_format_spec_results (&spec);
 }
 
 void
@@ -77,30 +91,28 @@ mutest_spec_skip (const char *reason)
     mutest_assert_if_reached ("skip called without a spec");
 
   spec->skip_all = true;
+  spec->skip_reason = reason;
 }
 
 void
-mutest_spec_add_result (mutest_spec_t *spec,
-                        mutest_expect_t *expect)
+mutest_spec_add_expect_result (mutest_spec_t *spec,
+                               mutest_expect_t *expect)
 {
   switch (expect->result)
     {
     case MUTEST_RESULT_PASS:
-      spec->n_tests += 1;
+      spec->n_expects += 1;
       spec->pass += 1;
-      mutest_add_pass ();
       break;
 
     case MUTEST_RESULT_FAIL:
-      spec->n_tests += 1;
+      spec->n_expects += 1;
       spec->fail += 1;
-      mutest_add_fail ();
       break;
 
     case MUTEST_RESULT_SKIP:
-      spec->n_tests += 1;
+      spec->n_expects += 1;
       spec->skip += 1;
-      mutest_add_skip ();
       break;
     }
 }

@@ -7,7 +7,7 @@ project(
     'warning_level=2',
   ],
   license: 'MIT',
-  meson_version: '>= 0.49.0',
+  meson_version: '>= 0.50.1',
 )
 
 add_project_arguments([ '-D_GNU_SOURCE' ], language: 'c')

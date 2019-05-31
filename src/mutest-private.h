@@ -20,37 +20,6 @@
 MUTEST_BEGIN_DECLS
 
 typedef enum {
-  MUTEST_OUTPUT_MOCHA,
-  MUTEST_OUTPUT_TAP
-} mutest_output_format_t;
-
-typedef struct {
-  bool initialized;
-
-  int term_width;
-  int term_height;
-
-  bool is_tty;
-  bool use_colors;
-
-  mutest_suite_t *current_suite;
-  mutest_spec_t *current_spec;
-
-  int n_tests;
-  int pass;
-  int fail;
-  int skip;
-
-  int64_t start_time;
-  int64_t end_time;
-
-  mutest_output_format_t output_format;
-
-  mutest_hook_func_t before_hook;
-  mutest_hook_func_t after_hook;
-} mutest_state_t;
-
-typedef enum {
   MUTEST_RESULT_PASS,
   MUTEST_RESULT_FAIL,
   MUTEST_RESULT_SKIP
@@ -87,6 +56,51 @@ typedef enum {
                           MUTEST_COLLECT_BOOLEAN
 } mutest_collect_type_t;
 
+typedef enum {
+  MUTEST_OUTPUT_MOCHA,
+  MUTEST_OUTPUT_TAP
+} mutest_output_format_t;
+
+typedef struct {
+  bool initialized;
+
+  int term_width;
+  int term_height;
+
+  bool is_tty;
+  bool use_colors;
+
+  mutest_suite_t *current_suite;
+  mutest_spec_t *current_spec;
+
+  int n_suites;
+  int total_tests;
+  int total_pass;
+  int total_fail;
+  int total_skip;
+
+  int64_t start_time;
+  int64_t end_time;
+
+  mutest_output_format_t output_format;
+
+  mutest_hook_func_t before_hook;
+  mutest_hook_func_t after_hook;
+} mutest_state_t;
+
+typedef struct {
+  void (* suite_preamble) (mutest_suite_t *suite);
+  void (* spec_preamble) (mutest_spec_t *spec);
+  void (* expect_result) (mutest_expect_t *expect);
+  void (* expect_fail) (mutest_expect_t *expect,
+                        bool negate,
+                        mutest_expect_res_t *check,
+                        const char *check_repr);
+  void (* spec_results) (mutest_spec_t *spec);
+  void (* suite_results) (mutest_suite_t *suite);
+  void (* total_results) (mutest_state_t *state);
+} mutest_formatter_t;
+
 typedef mutest_expect_res_t *(* mutest_collect_func_t) (mutest_expect_type_t expect_type,
                                                         mutest_collect_type_t collect_type,
                                                         va_list *args);
@@ -98,7 +112,10 @@ struct _mutest_expect_res_t
   union {
     bool v_bool;
 
-    int v_int;
+    struct {
+      int value;
+      int tolerance;
+    } v_int;
 
     struct {
       int min;
@@ -145,7 +162,7 @@ struct _mutest_spec_t
 
   const char *description;
 
-  int n_tests;
+  int n_expects;
   int pass;
   int fail;
   int skip;
@@ -154,6 +171,7 @@ struct _mutest_spec_t
   int64_t end_time;
 
   bool skip_all;
+  const char *skip_reason;
 };
 
 struct _mutest_suite_t
@@ -170,7 +188,13 @@ struct _mutest_suite_t
   mutest_hook_func_t before_each_hook;
   mutest_hook_func_t after_each_hook;
 
+  int n_specs;
+  int pass;
+  int fail;
+  int skip;
+
   bool skip_all;
+  const char *skip_reason;
 };
 
 #define mutest_oom_abort() \
@@ -189,6 +213,19 @@ struct _mutest_suite_t
 # define mutest_likely(x)       (x)
 # define mutest_unlikely(x)     (x)
 #endif
+
+#define ANSI_ESCAPE "\033"
+
+#define MUTEST_COLOR_NONE               ANSI_ESCAPE "[0m"
+#define MUTEST_COLOR_RED                ANSI_ESCAPE "[1;31m"
+#define MUTEST_COLOR_GREEN              ANSI_ESCAPE "[1;32m"
+#define MUTEST_COLOR_YELLOW             ANSI_ESCAPE "[1;33m"
+#define MUTEST_COLOR_BLUE               ANSI_ESCAPE "[1;34m"
+#define MUTEST_COLOR_LIGHT_GREY         ANSI_ESCAPE "[1;37m"
+
+#define MUTEST_BOLD_DEFAULT             ANSI_ESCAPE "[1;39m"
+#define MUTEST_DIM_DEFAULT              ANSI_ESCAPE "[2;39m"
+#define MUTEST_UNDERLINE_DEFAULT        ANSI_ESCAPE "[4;39m"
 
 mutest_expect_res_t *
 mutest_expect_res_alloc (mutest_expect_type_t type);
@@ -243,14 +280,9 @@ mutest_get_current_spec (void);
 int64_t
 mutest_get_current_time (void);
 
-void
-mutest_add_pass (void);
-
-void
-mutest_add_fail (void);
-
-void
-mutest_add_skip (void);
+double
+mutest_format_time (int64_t t,
+                    const char **unit);
 
 void
 mutest_expect_res_to_string (mutest_expect_res_t *res,
@@ -258,31 +290,56 @@ mutest_expect_res_to_string (mutest_expect_res_t *res,
                              size_t len);
 
 void
-mutest_spec_add_result (mutest_spec_t *spec,
-                        mutest_expect_t *expect);
-
-void
-mutest_print_suite_preamble (mutest_suite_t *suite);
-
-void
-mutest_print_totals (void);
-
-void
-mutest_print_spec_preamble (mutest_spec_t *suite);
-
-void
-mutest_print_spec_totals (mutest_spec_t *spec);
-
-void
-mutest_print_suite_totals (mutest_suite_t *suite);
-
-void
-mutest_print_expect (mutest_expect_t *expect);
-
-void
-mutest_print_expect_fail (mutest_expect_t *expect,
+mutest_expect_diagnostic (mutest_expect_t *expect,
                           bool negate,
                           mutest_expect_res_t *check,
-                          const char *check_repr);
+                          const char *check_repr,
+                          char **diagnostic,
+                          char **location);
+
+void
+mutest_spec_add_expect_result (mutest_spec_t *spec,
+                               mutest_expect_t *expect);
+
+void
+mutest_suite_add_spec_results (mutest_suite_t *suite,
+                               mutest_spec_t *spec);
+
+void
+mutest_add_suite_results (mutest_suite_t *suite);
+
+int
+mutest_get_results (int *total_pass,
+                    int *total_fail,
+                    int *total_skip);
+
+void
+mutest_format_suite_preamble (mutest_suite_t *suite);
+
+void
+mutest_format_spec_preamble (mutest_spec_t *spec);
+
+void
+mutest_format_expect_result (mutest_expect_t *expect);
+
+void
+mutest_format_expect_fail (mutest_expect_t *expect,
+                           bool negate,
+                           mutest_expect_res_t *check,
+                           const char *check_repr);
+void
+mutest_format_spec_results (mutest_spec_t *spec);
+
+void
+mutest_format_suite_results (mutest_suite_t *suite);
+
+void
+mutest_format_total_results (mutest_state_t *state);
+
+const mutest_formatter_t *
+mutest_get_mocha_formatter (void);
+
+const mutest_formatter_t *
+mutest_get_tap_formatter (void);
 
 MUTEST_END_DECLS

@@ -1,4 +1,4 @@
-/* mutest-expect-types.c: Result types
+/* mutest-wrappers.c: Value wrappers
  *
  * µTest - Copyright 2019  Emmanuele Bassi
  *
@@ -61,7 +61,12 @@ mutest_expect_res_to_string (mutest_expect_res_t *res,
       break;
 
     case MUTEST_EXPECT_INT:
-      snprintf (buf, len, "%d", res->expect.v_int);
+      if (res->expect.v_int.tolerance == 0)
+        snprintf (buf, len, "%d", res->expect.v_int.value);
+      else
+        snprintf (buf, len, "%d (± %d)",
+                  res->expect.v_int.value,
+                  res->expect.v_int.tolerance);
       break;
 
     case MUTEST_EXPECT_INT_RANGE:
@@ -153,7 +158,8 @@ mutest_int_value (int value)
     mutest_oom_abort ();
 
   res->expect_type = MUTEST_EXPECT_INT;
-  res->expect.v_int = value;
+  res->expect.v_int.value = value;
+  res->expect.v_int.tolerance = 0;
 
   return res;
 }
@@ -164,7 +170,7 @@ mutest_get_int_value (const mutest_expect_res_t *res)
   if (res->expect_type != MUTEST_EXPECT_INT)
     mutest_assert_if_reached ("invalid integer value");
 
-  return res->expect.v_int;
+  return res->expect.v_int.value;
 }
 
 mutest_expect_res_t *

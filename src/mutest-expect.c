@@ -136,7 +136,11 @@ mutest_collect_number (mutest_expect_type_t value_type,
       break;
 
     case MUTEST_EXPECT_INT:
-      retval->expect.v_int = va_arg (*args, int);
+      retval->expect.v_int.value = va_arg (*args, int);
+      if (collect_precision)
+        retval->expect.v_int.tolerance = va_arg (*args, int);
+      else
+        retval->expect.v_int.tolerance = 0;
       break;
 
     case MUTEST_EXPECT_FLOAT:
@@ -222,6 +226,19 @@ mutest_collect_scalar (mutest_expect_type_t value_type,
       (value_type == MUTEST_EXPECT_FLOAT && collect_float))
     return mutest_collect_number (value_type, collect_type, args);
 
+  if ((value_type == MUTEST_EXPECT_INT_RANGE && collect_int) ||
+      (value_type == MUTEST_EXPECT_FLOAT_RANGE && collect_float))
+    {
+      /* We're collecting a scalar from a range, so we need to override
+       * the collection flags and force a type
+       */
+      if (value_type == MUTEST_EXPECT_INT_RANGE)
+        collect_type = MUTEST_COLLECT_INT;
+      else if (value_type == MUTEST_EXPECT_FLOAT_RANGE)
+        collect_type = MUTEST_COLLECT_FLOAT;
+      return mutest_collect_number (value_type, collect_type, args);
+    }
+
   if (value_type == MUTEST_EXPECT_STR && collect_string)
     return mutest_collect_string (value_type, collect_type, args);
 
@@ -300,36 +317,9 @@ static const struct {
     mutest_collect_scalar,
     NULL,
   },
-
-  /* Legacy matchers */
-  { mutest_to_be_int_value,
-    MUTEST_COLLECT_INT,
-    mutest_collect_number,
-    NULL,
-  },
-  { mutest_to_be_in_int_range,
-    MUTEST_COLLECT_INT | MUTEST_COLLECT_RANGE,
-    mutest_collect_number,
-    NULL,
-  },
-  { mutest_to_be_float_value,
-    MUTEST_COLLECT_FLOAT | MUTEST_COLLECT_PRECISION,
-    mutest_collect_number,
-    NULL,
-  },
-  { mutest_to_be_in_float_range,
-    MUTEST_COLLECT_FLOAT | MUTEST_COLLECT_RANGE,
-    mutest_collect_number,
-    NULL,
-  },
-  { mutest_to_be_string,
-    MUTEST_COLLECT_STRING,
-    mutest_collect_string,
-    NULL,
-  },
-  { mutest_to_be_pointer,
-    MUTEST_COLLECT_POINTER,
-    mutest_collect_pointer,
+  { mutest_to_contain,
+    MUTEST_COLLECT_SCALAR | MUTEST_COLLECT_MATCHING_TYPE,
+    mutest_collect_scalar,
     NULL,
   },
 };
@@ -412,7 +402,7 @@ mutest_expect_full (const char *file,
       res = negate ? !res : res;
 
       if (!res)
-        mutest_print_expect_fail (&e, negate, check, repr);
+        mutest_format_expect_fail (&e, negate, check, repr);
 
       if (e.result == MUTEST_RESULT_PASS)
         e.result = res ? MUTEST_RESULT_PASS : MUTEST_RESULT_FAIL;
@@ -424,9 +414,9 @@ mutest_expect_full (const char *file,
 
   va_end (args);
 
-  mutest_spec_add_result (mutest_get_current_spec (), &e);
+  mutest_spec_add_expect_result (mutest_get_current_spec (), &e);
 
-  mutest_print_expect (&e);
+  mutest_format_expect_result (&e);
 
   mutest_expect_res_free (value);
 }
@@ -438,4 +428,75 @@ mutest_expect_value (mutest_expect_t *e)
     mutest_assert_if_reached ("invalid expectation");
 
   return e->value;
+}
+
+void
+mutest_expect_diagnostic (mutest_expect_t *expect,
+                          bool negate,
+                          mutest_expect_res_t *check,
+                          const char *check_repr,
+                          char **diagnostic_p,
+                          char **location_p)
+{
+  char location[256];
+  snprintf (location, 256, "%s (%s:%d)",
+            expect->func_name,
+            expect->file,
+            expect->line);
+
+  char lhs[256], rhs[256], comparison[16];
+
+  mutest_expect_res_to_string (expect->value, lhs, 256);
+
+  if (check != NULL)
+    {
+      switch (expect->value->expect_type)
+        {
+        case MUTEST_EXPECT_INVALID:
+          snprintf (comparison, 16, " ? ");
+          break;
+        case MUTEST_EXPECT_BOOLEAN:
+        case MUTEST_EXPECT_INT:
+        case MUTEST_EXPECT_STR:
+        case MUTEST_EXPECT_POINTER:
+          snprintf (comparison, 16, " %s ", negate ? "≢" : "≡");
+          break;
+        case MUTEST_EXPECT_FLOAT:
+          snprintf (comparison, 16, " %s ", negate ? "≉" : "≈");
+          break;
+        case MUTEST_EXPECT_INT_RANGE:
+        case MUTEST_EXPECT_FLOAT_RANGE:
+          snprintf (comparison, 16, " %s ", negate ? "∌" : "∋");
+          break;
+        }
+
+      if (check_repr != NULL)
+        snprintf (rhs, 256, "%s", check_repr);
+      else
+        mutest_expect_res_to_string (check, rhs, 256);
+    }
+  else
+    {
+      rhs[0] = '\0';
+      comparison[0] = '\0';
+    }
+
+  if (diagnostic_p != NULL)
+    {
+      size_t lhs_len = strlen (lhs);
+      size_t cmp_len = strlen (comparison);
+      size_t rhs_len = strlen (rhs);
+      size_t diagnostic_len = lhs_len + 1 + cmp_len + 1 + rhs_len;
+
+      *diagnostic_p = malloc (sizeof (char) * diagnostic_len + 1);
+      snprintf (*diagnostic_p, diagnostic_len + 1, "%s %s %s", lhs, comparison, rhs);
+    }
+
+  if (location_p != NULL)
+    {
+      size_t loc_len = strlen (location);
+
+      *location_p = malloc (sizeof (char) * loc_len + 1);
+      snprintf (*location_p, loc_len + 1, "%s", location);
+    }
 }
