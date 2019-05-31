@@ -7,11 +7,11 @@ general_spec (void)
 
   mutest_expect ("a is true",
                  mutest_bool_value (a),
-                 mutest_to_be_true,
+                 mutest_to_be, true,
                  NULL);
   mutest_expect ("a is not false",
                  mutest_bool_value (a),
-                 mutest_not, mutest_to_be_false,
+                 mutest_not, mutest_to_be, false,
                  NULL);
 }
 
@@ -22,16 +22,16 @@ another_spec (void)
 
   mutest_expect ("str contains 'hello'",
                  mutest_string_value (str),
-                 mutest_to_contain_string, "hello",
+                 mutest_to_contain, "hello",
                  NULL);
   mutest_expect ("str contains 'world'",
                  mutest_string_value (str),
-                 mutest_to_contain_string, "world",
+                 mutest_to_contain, "world",
                  NULL);
   mutest_expect ("contains all fragments",
                  mutest_string_value (str),
                  mutest_to_start_with_string, "hello",
-                 mutest_to_contain_string, ",",
+                 mutest_to_contain, ",",
                  mutest_to_end_with_string, "world",
                  NULL);
 }
