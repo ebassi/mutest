@@ -41,7 +41,7 @@ after_hook (void)
 static void
 called_before_hook (mutest_spec_t *spec MUTEST_UNUSED)
 {
-  mutest_expect ("before_called is set",
+  mutest_expect ("before_called to have been called yet",
                  mutest_int_value (fixture.before_called),
                  mutest_to_be, 1,
                  NULL);
@@ -50,7 +50,7 @@ called_before_hook (mutest_spec_t *spec MUTEST_UNUSED)
 static void
 called_after_hook (mutest_spec_t *spec MUTEST_UNUSED)
 {
-  mutest_expect ("after_called is not set",
+  mutest_expect ("after_called to not have been called",
                  mutest_int_value (fixture.after_called),
                  mutest_to_be, -1,
                  NULL);
@@ -59,7 +59,7 @@ called_after_hook (mutest_spec_t *spec MUTEST_UNUSED)
 static void
 calls_before_each_hook (mutest_spec_t *spec MUTEST_UNUSED)
 {
-  mutest_expect ("before_each_counter is non-zero",
+  mutest_expect ("before_each_counter to have been called at least once",
                  mutest_int_value (fixture.before_each_counter),
                  mutest_not, mutest_to_be, 0,
                  NULL);
@@ -68,7 +68,7 @@ calls_before_each_hook (mutest_spec_t *spec MUTEST_UNUSED)
 static void
 calls_after_each_hook (mutest_spec_t *spec MUTEST_UNUSED)
 {
-  mutest_expect ("before_each_counter is non-zero",
+  mutest_expect ("before_each_counter to have been called at least once",
                  mutest_int_value (fixture.after_each_counter),
                  mutest_not, mutest_to_be, 0,
                  NULL);
@@ -77,8 +77,8 @@ calls_after_each_hook (mutest_spec_t *spec MUTEST_UNUSED)
 static void
 hooks_spec (mutest_suite_t *suite MUTEST_UNUSED)
 {
-  mutest_it ("called before hook", called_before_hook);
-  mutest_it ("didn't call after hook", called_after_hook);
+  mutest_it ("calls before hook before the spec", called_before_hook);
+  mutest_it ("didn't call after hook yet", called_after_hook);
 }
 
 static void

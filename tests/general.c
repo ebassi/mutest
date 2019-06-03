@@ -5,11 +5,11 @@ general_spec (void)
 {
   bool a = true;
 
-  mutest_expect ("a is true",
+  mutest_expect ("a to be true",
                  mutest_bool_value (a),
                  mutest_to_be, true,
                  NULL);
-  mutest_expect ("a is not false",
+  mutest_expect ("a to not be false",
                  mutest_bool_value (a),
                  mutest_not, mutest_to_be, false,
                  NULL);
@@ -20,15 +20,15 @@ another_spec (void)
 {
   const char *str = "hello, world";
 
-  mutest_expect ("str contains 'hello'",
+  mutest_expect ("'str' to contain a greeting",
                  mutest_string_value (str),
                  mutest_to_contain, "hello",
                  NULL);
-  mutest_expect ("str contains 'world'",
+  mutest_expect ("'str' to contain who we are greeting",
                  mutest_string_value (str),
                  mutest_to_contain, "world",
                  NULL);
-  mutest_expect ("contains all fragments",
+  mutest_expect ("'str' to contain all parts of a greeting",
                  mutest_string_value (str),
                  mutest_to_start_with_string, "hello",
                  mutest_to_contain, ",",
@@ -50,9 +50,9 @@ general_suite (void)
 {
   mutest_it ("contains at least a spec with an expectation", general_spec);
   mutest_it ("can contain multiple specs", another_spec);
-  mutest_it ("should be skipped", skip_spec);
+  mutest_it ("can contain expectations that can be skipped", skip_spec);
 }
 
 MUTEST_MAIN (
-  mutest_describe ("General", general_suite);
+  mutest_describe ("A suite", general_suite);
 )
