@@ -39,13 +39,27 @@ mutest_to_be_boolean (mutest_expect_t *e,
   return false;
 }
 
+static inline bool
+int_near_equal (int a,
+                int b,
+                int epsilon)
+{
+  return (a > b ? (a - b) : (b - a)) <= epsilon;
+}
+
 static bool
 mutest_to_be_int_value (mutest_expect_t *e,
                         mutest_expect_res_t *check)
 {
-  if (e->value->expect_type == MUTEST_EXPECT_INT &&
+  mutest_expect_res_t *value = e->value;
+
+  if (value->expect_type == MUTEST_EXPECT_INT &&
       check->expect_type == MUTEST_EXPECT_INT)
-    return e->value->expect.v_int.value == check->expect.v_int.value;
+    {
+      return int_near_equal (value->expect.v_int.value,
+                             check->expect.v_int.value,
+                             check->expect.v_int.tolerance);
+    }
 
   return false;
 }
@@ -65,10 +79,10 @@ mutest_to_be_in_int_range (mutest_expect_t *e,
   return false;
 }
 
-static bool
-near_equal (double a,
-            double b,
-            double epsilon)
+static inline bool
+float_near_equal (double a,
+                  double b,
+                  double epsilon)
 {
   return (a > b ? (a - b) : (b - a)) <= epsilon;
 }
@@ -77,12 +91,14 @@ static bool
 mutest_to_be_float_value (mutest_expect_t *e,
                           mutest_expect_res_t *check)
 {
-  if (e->value->expect_type == MUTEST_EXPECT_FLOAT &&
+  mutest_expect_res_t *value = e->value;
+
+  if (value->expect_type == MUTEST_EXPECT_FLOAT &&
       check->expect_type == MUTEST_EXPECT_FLOAT)
     {
-      return near_equal (e->value->expect.v_float.value,
-                         check->expect.v_float.value,
-                         check->expect.v_float.tolerance);
+      return float_near_equal (value->expect.v_float.value,
+                               check->expect.v_float.value,
+                               check->expect.v_float.tolerance);
     }
 
   return false;
@@ -182,7 +198,15 @@ bool
 mutest_to_be_close_to (mutest_expect_t *e,
                        mutest_expect_res_t *check)
 {
-  return mutest_to_be_float_value (e, check);
+  mutest_expect_res_t *value = e->value;
+
+  if (value->expect_type == MUTEST_EXPECT_FLOAT)
+    return mutest_to_be_float_value (e, check);
+
+  if (value->expect_type == MUTEST_EXPECT_INT)
+    return mutest_to_be_int_value (e, check);
+
+  return false;
 }
 
 bool
