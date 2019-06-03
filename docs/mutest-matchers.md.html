@@ -54,6 +54,11 @@ The expectation is composed of three separate matchers:
 The expectation, in the case above, is only satisfied if all three
 matcher functions are satisfied.
 
+Matcher functions provided by µTest can automatically collect the expected
+values from the variadic arguments list passed to `mutest_expect()` without
+explicitly wrapping them with a `mutest_expect_res_t`. Custom matchers, on
+the other hand, require an explicit value wrapper.
+
 ### Includes
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,7 +73,8 @@ mutest_not (mutest_expect_t *e,
             mutest_expect_res_t *check);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Negates the condition of the following matcher function.
+A special matcher function that negates the condition of the following matcher
+function.
 
 For instance:
 
@@ -96,6 +102,9 @@ mutest_to_be (mutest_expect_t *e,
 
 Matches the value in `e` to the value in `check` exactly.
 
+This matcher collects a value that matches the type of the value
+passed to `mutest_expect()`.
+
 e
 : the expectation object
 check
@@ -114,6 +123,20 @@ mutest_to_be_close_to (mutest_expect_t *e,
 Checks whether the value in `e` is within a given tolerance of the value
 wrapped by `check`.
 
+This matcher collects two values:
+
+ - the numeric value to be used in the comparison
+ - the numeric value to be used as a tolerance
+
+e.g.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  mutest_expect ("angle to be close to π",
+                 mutest_float_value (angle),
+                 mutest_to_be_close_to, M_PI, 0.0001,
+                 NULL);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 e
 : the expectation object
 check
@@ -130,6 +153,8 @@ mutest_to_be_nan (mutest_expect_t *e,
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Checks whether the floating point value in `e` is NaN (Not a Number).
+
+This matcher collects the numeric value to be used in the comparison.
 
 e
 : the expectation object
@@ -148,6 +173,8 @@ mutest_to_be_positive_infinity (mutest_expect_t *e,
 
 Checks whether the floating point value in `e` is a positive infinity.
 
+This matcher collects the numeric value to be used in the comparison.
+
 e
 : the expectation object
 check
@@ -165,6 +192,8 @@ mutest_to_be_negative_infinity (mutest_expect_t *e,
 
 Checks whether the floating point value in `e` is a negative infinity.
 
+This matcher collects the numeric value to be used in the comparison.
+
 e
 : the expectation object
 check
@@ -181,6 +210,8 @@ mutest_to_be_greater_than (mutest_expect_t *e,
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Checks whether the numeric value in `e` is greater than the value in `check`.
+
+This matcher collects the numeric value to be used in the comparison.
 
 e
 : the expectation object
@@ -200,6 +231,8 @@ mutest_to_be_greater_than_or_equal (mutest_expect_t *e,
 Checks whether the numeric value in `e` is greater than, or equal to
 the value in `check`.
 
+This matcher collects the numeric value to be used in the comparison.
+
 e
 : the expectation object
 check
@@ -218,6 +251,8 @@ mutest_to_be_less_than_or_equal (mutest_expect_t *e,
 Checks whether the numeric value in `e` is less than, or equal to
 the value in `check`.
 
+This matcher collects the numeric value to be used in the comparison.
+
 e
 : the expectation object
 check
@@ -235,6 +270,8 @@ mutest_to_be_less_than (mutest_expect_t *e,
 
 Checks whether the numeric value in `e` is less than the value in `check`.
 
+This matcher collects the numeric value to be used in the comparison.
+
 e
 : the expectation object
 check
@@ -251,6 +288,15 @@ mutest_to_be_in_range (mutest_expect_t *e,
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Checks if the numeric value in `e` is inside the range in `check`.
+
+This matcher collects the numeric range as two values, e.g.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  mutest_expect ("number to be between 0 and 100",
+                 mutest_int_value (random_number),
+                 mutest_to_be_in_range, 0, 100,
+                 NULL);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 e
 : the expectation object
@@ -270,6 +316,9 @@ mutest_to_contain (mutest_expect_t *e,
 Checks if the numeric range, or string, in `e` contains the numeric
 value, or string, in `check`.
 
+This matcher collects the numeric or string value that should be
+contained in the numeric range or string value passed to `mutest_expect()`.
+
 e
 : the expectation object
 check
@@ -286,6 +335,9 @@ mutest_to_start_with_string (mutest_expect_t *e,
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Checks that the string in `e` starts with the string in `check`.
+
+This matcher collects the expected string that should be at
+the beginning of the string value passed to `mutest_expect()`.
 
 e
 : the expectation object
@@ -304,6 +356,9 @@ mutest_to_end_with_string (mutest_expect_t *e,
 
 Checks that the string in `e` ends with the string in `check`.
 
+This matcher collects the expected string that should be at
+the end of the string value passed to `mutest_expect()`.
+
 e
 : the expectation object
 check
@@ -320,6 +375,8 @@ mutest_to_be_true (mutest_expect_t *e,
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Checks that the boolean value in `e` is true.
+
+This matcher does not collect any value.
 
 e
 : the expectation object
@@ -338,6 +395,8 @@ mutest_to_be_false (mutest_expect_t *e,
 
 Checks that the boolean value in `e` is false.
 
+This matcher does not collect any value.
+
 e
 : the expectation object
 check
@@ -354,6 +413,31 @@ mutest_to_be_null (mutest_expect_t *e,
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Checks that the pointer value in `e` is `NULL`.
+
+This matcher does not collect any value.
+
+e
+: the expectation object
+check
+: the matcher argument
+return value
+: `true` if the matcher is satisfied, and `false` otherwise
+
+----
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bool
+mutest_skip (mutest_expect_t *e,
+             mutest_expect_res_t *check);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A special matcher function that will cause the expectation to be marked as
+skipped.
+
+This matcher collects a string that contains a human readable reason for
+the expectation to be skipped.
+
+You should use this matcher as the only one in an expectation.
 
 e
 : the expectation object
