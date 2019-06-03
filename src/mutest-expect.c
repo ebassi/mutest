@@ -368,6 +368,7 @@ mutest_expect_full (const char *file,
       if (matcher_func == mutest_skip)
         {
           e.result = MUTEST_RESULT_SKIP;
+          e.skip_reason = va_arg (args, char *);
           break;
         }
 

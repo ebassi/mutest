@@ -149,6 +149,8 @@ struct _mutest_expect_t
 
   const char *description;
 
+  const char *skip_reason;
+
   mutest_expect_res_t *value;
 
   mutest_result_t result;

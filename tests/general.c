@@ -39,9 +39,9 @@ another_spec (void)
 static void
 skip_spec (void)
 {
-  mutest_expect ("skip this test",
+  mutest_expect ("to be able to skip an expectation",
                  mutest_bool_value (true),
-                 mutest_skip,
+                 mutest_skip, "for any reason",
                  NULL);
 }
 
