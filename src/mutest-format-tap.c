@@ -32,7 +32,8 @@ tap_expect_result (mutest_expect_t *expect)
 
     case MUTEST_RESULT_SKIP:
       mutest_print (stdout,
-                    "ok ", buf, " - ", expect->description, " # SKIP",
+                    "ok ", buf, " - ", expect->description,
+                    " # SKIP: ", expect->skip_reason != NULL ? expect->skip_reason : "",
                     NULL);
       break;
     }
