@@ -9,12 +9,11 @@ else
 fi
 
 # Update everything
-pacman --noconfirm -Suy
+pacman --noconfirm -Syu
 
 # Install the required packages
-pacman --noconfirm -S --needed \
-    base-devel \
-    mingw-w64-$MSYS2_ARCH-toolchain \
+pacman --noconfirm -Syyu --needed \
+    mingw-w64-$MSYS2_ARCH-gcc \
     mingw-w64-$MSYS2_ARCH-meson \
     mingw-w64-$MSYS2_ARCH-ninja \
     mingw-w64-$MSYS2_ARCH-pkg-config \
