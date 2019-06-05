@@ -9,7 +9,8 @@ else
 fi
 
 # Update everything
-pacman --noconfirm -Syu
+pacman --noconfirm --sync --refresh --refresh pacman
+pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
 
 # Install the required packages
 pacman --noconfirm -Syyu --needed \
