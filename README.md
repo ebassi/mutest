@@ -3,12 +3,37 @@
  - **Linux**: [![Build Status](https://travis-ci.org/ebassi/mutest.svg?branch=master)](https://travis-ci.org/ebassi/mutest)
  - **Windows**: [![Build status](https://ci.appveyor.com/api/projects/status/1ghtdpt42u3vy8s9/branch/master?svg=true)](https://ci.appveyor.com/project/ebassi/mutest/branch/master)
 
+## What is µTest
+
 µTest aims to be a small unit testing library for C projects, with an API
-heavily modelled on high level frameworks like Jasmine or Mocha.
+heavily modelled on high level [Behavior-Driver Development][bdd] frameworks
+like [Jasmine][jasminejs] or [Mocha][mochajs].
+
+µTest is written in C99, and can be used on multiple platforms.
+
+### Features
+
+ - Small API footprint
+ - Easy to use
+ - Portable
+ - Zero dependencies
+ - Supports [TAP](https://testanything.org)
+
+### Screenshot
+
+[!Screenshot](./mutest-mocha-format.png)
+
+[bdd]: https://en.wikipedia.org/wiki/Behavior-driven_development
+[jasminejs]: https://jasmine.github.io/
+[mochajs]: https://mochajs.org/
 
 **WARNING**: µTest's API is still in flux!
 
-## Building µTest
+---
+
+## Getting Started
+
+### Building µTest
 
 Simply clone this repository, and use [Meson](http://mesonbuild.com) to
 generate the appropriate build instructions:
@@ -23,11 +48,11 @@ $ meson test
 $ sudo ninja install
 ```
 
-## Getting started
+### Using µTest
 
 The documentation of µTest is [available online](https://ebassi.github.io/mutest/mutest.md.html).
 
-## Contributing
+### Contributing
 
 See the [Contribution guide](./CONTRIBUTING.md).
 
