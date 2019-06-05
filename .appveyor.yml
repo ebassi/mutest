@@ -11,8 +11,8 @@ environment:
       DO_DEPLOY: true
     - MSVC_PLATFORM: x86
       DO_DEPLOY: true
-    - MSYSTEM: MINGW64
-    - MSYSTEM: MINGW32
+#    - MSYSTEM: MINGW64
+#    - MSYSTEM: MINGW32
 
 # AppVeyor doesn't do this automatically like Travis does
 install:
@@ -21,9 +21,10 @@ install:
 
 build_script:
   - IF DEFINED MSVC_PLATFORM ".appveyor/msvc.bat"
-  - IF DEFINED MSYSTEM set CHERE_INVOKING=yes
-  - IF DEFINED MSYSTEM C:\msys64\usr\bin\bash -lc "bash -x .appveyor/msys2-pre.sh"
-  - IF DEFINED MSYSTEM C:\msys64\usr\bin\bash -lc "bash -x .appveyor/msys2.sh"
+# Disabled because of GCC 9.1 upgrade disaster
+#  - IF DEFINED MSYSTEM set CHERE_INVOKING=yes
+#  - IF DEFINED MSYSTEM C:\msys64\usr\bin\bash -lc "bash -x .appveyor/msys2-pre.sh"
+#  - IF DEFINED MSYSTEM C:\msys64\usr\bin\bash -lc "bash -x .appveyor/msys2.sh"
 
 artifacts:
   - path: mutest-shared-win-%MSVC_PLATFORM%.zip
