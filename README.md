@@ -21,7 +21,9 @@ like [Jasmine][jasminejs] or [Mocha][mochajs].
 
 ### Screenshot
 
-![Screenshot](./mutest-mocha-format.png)
+![µTest on Linux](./mutest-mocha-format.png)
+
+![µTest on Windows, using MSYS2](./mutest-msys2.png)
 
 [bdd]: https://en.wikipedia.org/wiki/Behavior-driven_development
 [jasminejs]: https://jasmine.github.io/
