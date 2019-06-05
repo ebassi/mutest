@@ -7,9 +7,9 @@ configuration: Release
 # Configure both 32-bit and 64-bit builds for MSVC / MSYS2
 environment:
   matrix:
-    - MSVC_PLATFORM: x86
-      DO_DEPLOY: true
     - MSVC_PLATFORM: x64
+      DO_DEPLOY: true
+    - MSVC_PLATFORM: x86
       DO_DEPLOY: true
     - MSYSTEM: MINGW64
     - MSYSTEM: MINGW32
