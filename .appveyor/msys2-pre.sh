@@ -5,5 +5,10 @@ set -e
 # Disable slow diskspace check
 sed -i 's/^CheckSpace/#CheckSpace/g' /etc/pacman.conf
 
-# System upgrade
-pacman --noconfirm -Syyuu
+# Update everything
+pacman --noconfirm --sync --refresh --refresh pacman
+pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
+
+# Remove ADA and ObjC packages breaking the depenencies
+pacman -R --noconfirm mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-objc || true;
+pacman -R --noconfirm mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-objc || true;

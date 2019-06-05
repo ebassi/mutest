@@ -8,14 +8,6 @@ else
     export MSYS2_ARCH="x86_64"
 fi
 
-# Update everything
-pacman --noconfirm --sync --refresh --refresh pacman
-pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
-
-# Remove ADA and ObjC packages breaking the depenencies
-pacman -R --noconfirm mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-objc || true;
-pacman -R --noconfirm mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-objc || true;
-
 # Install the required packages
 pacman --noconfirm -Syyu --needed \
     mingw-w64-$MSYS2_ARCH-gcc \
