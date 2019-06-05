@@ -238,6 +238,9 @@ mutest_expect_res_free (mutest_expect_res_t *res);
 char *
 mutest_strdup (const char *str);
 
+char *
+mutest_getenv (const char *env_name);
+
 void
 mutest_print (FILE *stram,
               const char *first_fragment,

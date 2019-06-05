@@ -86,6 +86,23 @@ mutest_strdup (const char *str)
   return res;
 }
 
+char *
+mutest_getenv (const char *str)
+{
+#ifdef HAVE__DUPENV_S
+  size_t len = 0;
+  char *res = NULL;
+
+  errno_t err = _dupenv_s (&res, &len, str);
+  if (err)
+    return NULL;
+
+  return res;
+#else
+  return mutest_strdup (getenv (str));
+#endif
+}
+
 void
 mutest_print (FILE *stream,
               const char *first_fragment,
