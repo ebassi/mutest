@@ -6,8 +6,7 @@ set -e
 sed -i 's/^CheckSpace/#CheckSpace/g' /etc/pacman.conf
 
 # Update everything
-pacman --noconfirm --sync --refresh --refresh pacman
-pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
+pacman --noconfirm -Syyu
 
 # Remove ADA and ObjC packages breaking the depenencies
 pacman -R --noconfirm mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-objc || true;
