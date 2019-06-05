@@ -145,14 +145,15 @@ update_term_caps (void)
       return;
     }
 
-  const char *env = getenv ("FORCE_COLOR");
+  char *env = mutest_getenv ("FORCE_COLOR");
   if (env != NULL && env[0] != '\0')
     {
       global_state.use_colors = true;
+      free (env);
       return;
     }
 
-  env = getenv ("TERM");
+  env = mutest_getenv ("TERM");
   if (env != NULL)
     {
       if (strncmp (env, "xterm", 5) == 0 ||
@@ -163,14 +164,17 @@ update_term_caps (void)
           strncmp (env, "screen", 6) == 0)
         {
           global_state.use_colors = true;
-          return;
         }
+
+      free (env);
+      return;
     }
 
-  env = getenv ("COLORTERM");
+  env = mutest_getenv ("COLORTERM");
   if (env != NULL)
     {
       global_state.use_colors = true;
+      free (env);
       return;
     }
 
@@ -194,6 +198,19 @@ update_term_size (void)
 #endif
 }
 
+static void
+update_output_format (void)
+{
+  char *env = mutest_getenv ("MUTEST_OUTPUT");
+
+  if (env != NULL && strcmp (env, "tap") == 0)
+    global_state.output_format = MUTEST_OUTPUT_TAP;
+  else
+    global_state.output_format = MUTEST_OUTPUT_MOCHA;
+
+  free (env);
+}
+
 void
 mutest_before (mutest_hook_func_t hook)
 {
@@ -214,12 +231,7 @@ mutest_init (void)
 
   update_term_caps ();
   update_term_size ();
-
-  const char *env = getenv ("MUTEST_OUTPUT");
-  if (env != NULL && strcmp (env, "tap") == 0)
-    global_state.output_format = MUTEST_OUTPUT_TAP;
-  else
-    global_state.output_format = MUTEST_OUTPUT_MOCHA;
+  update_output_format ();
 
   global_state.start_time = mutest_get_current_time ();
 

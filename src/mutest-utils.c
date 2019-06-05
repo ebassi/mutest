@@ -86,6 +86,12 @@ mutest_strdup (const char *str)
   return res;
 }
 
+char *
+mutest_getenv (const char *str)
+{
+  return mutest_strdup (getenv (str));
+}
+
 void
 mutest_print (FILE *stream,
               const char *first_fragment,
