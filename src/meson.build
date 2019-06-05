@@ -27,6 +27,7 @@ endforeach
 test_functions = [
   [ 'isatty', 'unistd.h' ],
   [ 'clock_gettime', 'time.h' ],
+  [ '_dupenv_s', 'stdlib.h' ],
 ]
 
 foreach f: test_functions
