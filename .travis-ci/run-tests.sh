@@ -5,7 +5,7 @@ set -x
 builddir="_build"
 srcdir=`pwd`
 
-CFLAGS='-coverage -ftest-coverage -fprofile-arcs'
+export CFLAGS='-coverage -ftest-coverage -fprofile-arcs'
 
 meson --prefix /usr "$@" $builddir $srcdir || exit $?
 
