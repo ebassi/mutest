@@ -96,12 +96,23 @@ body {
     color: #3f51b5;
 }
 
+.md code { font-family: monospace; }
+
 /* inline and block code */
-.md code, .md pre.listing {
-    background-color: rgba(0,0,0,.05);
-    padding: 0.1em 0.2em;
-    border-radius: 0.15em;
+.md pre.listing {
+   background-color: rgba(0, 0, 0, 0.05);
+   border-radius: 6px;
+   box-shadow: 0px 5px 8px 0px rgba(0, 0, 0, 0.25);
+   font-family: monospace;
+   line-height: 1.2em;
+   border: none;
+   padding: 10px 1em;
+   overflow: auto;
+   white-space: pre;
+   word-break: normal;
+   word-wrap: normal;
 }
+
 .md pre.listing code {
     background-color: transparent;
     padding: 0;
