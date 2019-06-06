@@ -2,13 +2,14 @@
 
 set -x
 
-meson --prefix /usr "$@" _build . || exit $?
+builddir="_build"
+srcdir=`pwd`
 
-cd _build
+CFLAGS='-coverage -ftest-coverage -fprofile-arcs'
 
-ninja || exit $?
-meson test || exit $?
+meson --prefix /usr "$@" $builddir $srcdir || exit $?
 
-cd ..
+ninja -C $builddir || exit $?
+meson test -C $builddir || exit $?
 
-rm -rf _build
+cpp-coveralls -r . -b $builddir -i src -i ../src -e tests -e ../tests --gcov-options='\-lp'
