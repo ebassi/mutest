@@ -415,6 +415,12 @@ mutest_expect_full (const char *file,
 
   va_end (args);
 
+  mutest_spec_t *current = mutest_get_current_spec ();
+  if (current == NULL)
+    mutest_assert_if_reached ("No current spec defined. mutest_expect() may "
+                              "only be called from within a spec, "
+                              "not from within hooks.");
+
   mutest_spec_add_expect_result (mutest_get_current_spec (), &e);
 
   mutest_format_expect_result (&e);
