@@ -29,7 +29,8 @@ without necessarily failing the test.
 
 ### Functions
 
-MUTEST_PUBLIC
+#### `mutest_before`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void
 mutest_before (mutest_hook_func_t hook);
@@ -63,6 +64,8 @@ hook
 : a `mutest_hook_func_t` function
 
 ----
+
+#### `mutest_after`
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void
@@ -99,6 +102,8 @@ hook
 
 ----
 
+#### `mutest_before_each`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void
 mutest_before_each (mutest_hook_func_t hook);
@@ -133,6 +138,8 @@ hook
 : a `mutest_hook_func_t` function
 
 ----
+
+#### `mutest_after_each`
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void
@@ -176,5 +183,5 @@ typedef void (* mutest_hook_func_t) (void)
 The prototype of a function to pass to `mutest_before()`, `mutest_before_each()`,
 `mutest_after_each()`, or `mutest_after()`.
 
-<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'none'};</script>
+<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'medium'};</script>
 <!-- Markdeep: --><script src="markdeep.min.js" charset="utf-8"></script>

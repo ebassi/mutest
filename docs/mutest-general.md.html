@@ -12,6 +12,8 @@
 
 ### Functions
 
+#### `mutest_expect`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void
 mutest_expect (const char *description,
@@ -37,6 +39,8 @@ of all the matcher functions.
 
 ----
 
+#### `mutest_it`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void
 mutest_it (const char *description,
@@ -51,10 +55,12 @@ func
 Describes a new test specification.
 
 Specifications group various expectations; typically, you will use
-`mutest_expect()` to define each expectation that needs to be
-satisfied in order to pass the specification.
+[`mutest_expect()`](#//functions/mutest_expect) to define each
+expectation that needs to be satisfied in order to pass the specification.
 
 ----
+
+#### `mutest_describe`
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void
@@ -70,31 +76,32 @@ func
 Describes a new test suite.
 
 Test suites group various specification; typically, you will use
-`mutest_it()` to define each specification in a suite.
+[`mutest_it()`](#//functions/mutest_it) to define each specification in
+a suite.
 
 Each test binary can contain multiple test suites.
 
 ### Types
 
-`mutest_suite_t`
+#### `mutest_suite_t`
 
 An opaque structure representing a test suite.
 
 ----
 
-`mutest_spec_t`
+#### `mutest_spec_t`
 
 An opaque structure representing a specification in a suite.
 
 ----
 
-`mutest_expect_t`
+#### `mutest_expect_t`
 
 An opaque structure representing an expectation in a specification.
 
 ----
 
-`mutest_expect_res_t`
+#### `mutest_expect_res_t`
 
 An opaque structure representing the result of an expectation.
 
@@ -104,7 +111,7 @@ An opaque structure representing the result of an expectation.
 typedef void (* mutest_describe_func_t) (mutest_suite_t *suite)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The prototype of a function to pass to `mutest_describe()`.
+The prototype of a function to pass to [`mutest_describe()`](#//functions/mutest_describe).
 
 suite
 : the test suite object
@@ -115,14 +122,14 @@ suite
 void (* mutest_spec_func_t) (mutest_spec_t *spec)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The prototype of a function to pass to `mutest_it()`.
+The prototype of a function to pass to [`mutest_it()`](#//functions/mutest_it).
 
 ### Macros
 
-**MUTEST_MAIN (_C_)**
+**MUTEST_MAIN (\_C\_)**
 : A convenience pre-processor macro that defines main entry point of the test
   binary. This function will call `mutest_init()`, replace `_C_` with the body
   of the function, and finally call `mutest_report()`.
 
-<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'none'};</script>
+<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'medium'};</script>
 <!-- Markdeep: --><script src="markdeep.min.js" charset="utf-8"></script>

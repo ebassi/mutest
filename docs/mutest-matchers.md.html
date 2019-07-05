@@ -67,6 +67,8 @@ the other hand, require an explicit value wrapper.
 
 ### Functions
 
+#### `mutest_not`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
 mutest_not (mutest_expect_t *e,
@@ -94,6 +96,8 @@ return value
 
 ----
 
+#### `mutest_to_be`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
 mutest_to_be (mutest_expect_t *e,
@@ -113,6 +117,8 @@ return value
 : `true` if the matcher is satisfied, and `false` otherwise
 
 ----
+
+#### `mutest_to_be_close_to`
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
@@ -146,6 +152,8 @@ return value
 
 ----
 
+#### `mutest_to_be_nan`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
 mutest_to_be_nan (mutest_expect_t *e,
@@ -164,6 +172,8 @@ return value
 : `true` if the matcher is satisfied, and `false` otherwise
 
 ----
+
+#### `mutest_to_be_positive_infinity`
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
@@ -184,6 +194,8 @@ return value
 
 ----
 
+#### `mutest_to_be_negative_infinity`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
 mutest_to_be_negative_infinity (mutest_expect_t *e,
@@ -203,6 +215,8 @@ return value
 
 ----
 
+#### `mutest_to_be_greater_than`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
 mutest_to_be_greater_than (mutest_expect_t *e,
@@ -221,6 +235,8 @@ return value
 : `true` if the matcher is satisfied, and `false` otherwise
 
 ----
+
+#### `mutest_to_be_greater_than_or_equal`
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
@@ -242,6 +258,8 @@ return value
 
 ----
 
+#### `mutest_to_be_less_than_or_equal`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
 mutest_to_be_less_than_or_equal (mutest_expect_t *e,
@@ -262,6 +280,8 @@ return value
 
 ----
 
+#### `mutest_to_be_less_than`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
 mutest_to_be_less_than (mutest_expect_t *e,
@@ -280,6 +300,8 @@ return value
 : `true` if the matcher is satisfied, and `false` otherwise
 
 ----
+
+#### `mutest_to_be_in_range`
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
@@ -307,6 +329,8 @@ return value
 
 ----
 
+#### `mutest_to_contain`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
 mutest_to_contain (mutest_expect_t *e,
@@ -328,6 +352,8 @@ return value
 
 ----
 
+#### `mutest_to_start_with_string`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
 mutest_to_start_with_string (mutest_expect_t *e,
@@ -347,6 +373,8 @@ return value
 : `true` if the matcher is satisfied, and `false` otherwise
 
 ----
+
+#### `mutest_to_end_with_string`
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
@@ -368,6 +396,8 @@ return value
 
 ----
 
+#### `mutest_to_be_true`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
 mutest_to_be_true (mutest_expect_t *e,
@@ -386,6 +416,8 @@ return value
 : `true` if the matcher is satisfied, and `false` otherwise
 
 ----
+
+#### `mutest_to_be_false`
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
@@ -406,6 +438,8 @@ return value
 
 ----
 
+#### `mutest_to_be_null`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
 mutest_to_be_null (mutest_expect_t *e,
@@ -424,6 +458,8 @@ return value
 : `true` if the matcher is satisfied, and `false` otherwise
 
 ----
+
+#### `mutest_skip`
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
@@ -447,6 +483,8 @@ return value
 : `true` if the matcher is satisfied, and `false` otherwise
 
 ----
+
+#### `mutest_expect_value`
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 mutest_expect_res_t *
@@ -508,5 +546,5 @@ The prototype of a matcher function to pass to `mutest_expect()`.
 
 ----
 
-<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'none'};</script>
+<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'medium'};</script>
 <!-- Markdeep: --><script src="markdeep.min.js" charset="utf-8"></script>
