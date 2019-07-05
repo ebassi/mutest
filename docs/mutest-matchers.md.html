@@ -6,13 +6,14 @@
 
 ## Matchers
 
-_Matchers_ are functions passed to `mutest_expect()`. A matcher function takes
-a pointer to the expectation object, and a pointer to a value wrapper which
-containes the expected value.
+_Matchers_ are functions passed to [`mutest_expect()`](mutest-general.md.html#//functions/mutest_expect).
+A matcher function takes a pointer to the expectation object, and a pointer to
+a value wrapper which containes the expected value.
 
 If the value contained in the expectation object matches the expected value,
-the the matcher is satisfied. If all matcher functions passed to `mutest_expect()`
-are satisfied, the expectation is satisfied.
+the the matcher is satisfied. If all matcher functions passed to
+[`mutest_expect()`](mutest-general.md.html#//functions/mutest_expect) are
+satisfied, the expectation is satisfied.
 
 For instance, the following expectation:
 
@@ -25,9 +26,11 @@ For instance, the following expectation:
                  NULL);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Contains a single matcher, `mutest_to_be()`. The `mutest_to_be()` matcher
-is satisfied if the value in `str` and wrapped by `mutest_string_value()`
-matches the function parameter, following `mutest_to_be()` in the expectation.
+Contains a single matcher, [`mutest_to_be()`](#/matchers/functions/mutest_to_be). The
+[`mutest_to_be()`](#//functions/mutest_to_be) matcher is satisfied if the value
+in `str` and wrapped by [`mutest_string_value()`](mutest-wrappers.md.html#/valuewrappers/functions/mutest_string_value)
+matches the function parameter, following [`mutest_to_be()`](#/matchers/functions/mutest_to_be)
+in the expectation.
 
 In the following example:
 
@@ -37,19 +40,19 @@ In the following example:
   mutest_expect ("the string to contain all parts of the greeting",
                  mutest_string_value (str),
                  mutest_to_start_with_string, "hello",
-                 mutest_to_contain_string, ",",
+                 mutest_to_contain, ",",
                  mutest_to_end_with_string, "world",
                  NULL);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The expectation is composed of three separate matchers:
 
- - `mutest_to_start_with_string()`, which checks that the string value
-   starts with the matcher parameter
- - `mutest_to_contain_string()`, which checks that the string value
-   contains the matcher parameter
- - `mutest_to_end_with_string()`, which checks that the string value
-   ends with the matcher parameter
+ - [`mutest_to_start_with_string()`](#/matchers/functions/mutest_to_start_with_string),
+   which checks that the string value starts with the matcher parameter
+ - [`mutest_to_contain()`](#/matchers/functions/mutest_to_contain), which checks that
+   the string value contains the matcher parameter
+ - [`mutest_to_end_with_string()`](#/matchers/functions/mutest_to_end_with_string),
+   which checks that the string value ends with the matcher parameter
 
 The expectation, in the case above, is only satisfied if all three
 matcher functions are satisfied.
@@ -57,9 +60,9 @@ matcher functions are satisfied.
 !!! Note
     Matcher functions provided by µTest can automatically collect the
     expected values from the variadic arguments list passed to
-    `mutest_expect()` without explicitly wrapping them with a
-    `mutest_expect_res_t`. Custom matchers, on the other hand, require
-    an explicit value wrapper.
+    [`mutest_expect()`](mutest-general.md.html#//functions/mutest_expect)
+    without explicitly wrapping them with a `mutest_expect_res_t`. Custom
+    matchers, on the other hand, require an explicit value wrapper.
 
 ### Includes
 
