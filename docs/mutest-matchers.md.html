@@ -54,10 +54,12 @@ The expectation is composed of three separate matchers:
 The expectation, in the case above, is only satisfied if all three
 matcher functions are satisfied.
 
-Matcher functions provided by µTest can automatically collect the expected
-values from the variadic arguments list passed to `mutest_expect()` without
-explicitly wrapping them with a `mutest_expect_res_t`. Custom matchers, on
-the other hand, require an explicit value wrapper.
+!!! Note
+    Matcher functions provided by µTest can automatically collect the
+    expected values from the variadic arguments list passed to
+    `mutest_expect()` without explicitly wrapping them with a
+    `mutest_expect_res_t`. Custom matchers, on the other hand, require
+    an explicit value wrapper.
 
 ### Includes
 
