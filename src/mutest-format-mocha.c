@@ -86,7 +86,7 @@ mocha_spec_results (mutest_spec_t *spec)
           mutest_print (stdout,
                         "    ",
                         MUTEST_COLOR_YELLOW, "skipped: ",
-                        MUTEST_COLOR_LIGHT_GREY,
+                        MUTEST_COLOR_DARK_GREY,
                         spec->skip_reason != NULL ? spec->skip_reason : "unknown",
                         MUTEST_COLOR_NONE,
                         NULL);
@@ -122,7 +122,7 @@ mocha_spec_results (mutest_spec_t *spec)
                     "\n",
                     "      ",
                     MUTEST_COLOR_GREEN, passing_s, MUTEST_COLOR_NONE, " ",
-                    MUTEST_COLOR_LIGHT_GREY, delta_s, MUTEST_COLOR_NONE,
+                    MUTEST_COLOR_DARK_GREY, delta_s, MUTEST_COLOR_NONE,
                     NULL);
 
       if (spec->skip != 0)
@@ -159,7 +159,7 @@ mocha_suite_results (mutest_suite_t *suite)
                         "\n",
                         "  ",
                         MUTEST_COLOR_YELLOW, "skipped: ",
-                        MUTEST_COLOR_LIGHT_GREY,
+                        MUTEST_COLOR_DARK_GREY,
                         suite->skip_reason != NULL ? suite->skip_reason : "unknown",
                         MUTEST_COLOR_NONE,
                         NULL);
@@ -202,7 +202,7 @@ mocha_total_results (mutest_state_t *state)
                     "\n",
                     MUTEST_UNDERLINE_DEFAULT, "Total", MUTEST_COLOR_NONE, "\n",
                     MUTEST_COLOR_GREEN, passing_s, MUTEST_COLOR_NONE, " ",
-                      MUTEST_COLOR_LIGHT_GREY, delta_s, MUTEST_COLOR_NONE,
+                    MUTEST_COLOR_DARK_GREY, delta_s, MUTEST_COLOR_NONE,
                     NULL);
 
       if (total_skip != 0)

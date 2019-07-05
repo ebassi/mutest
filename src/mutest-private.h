@@ -224,6 +224,7 @@ struct _mutest_suite_t
 #define MUTEST_COLOR_YELLOW             ANSI_ESCAPE "[1;33m"
 #define MUTEST_COLOR_BLUE               ANSI_ESCAPE "[1;34m"
 #define MUTEST_COLOR_LIGHT_GREY         ANSI_ESCAPE "[1;37m"
+#define MUTEST_COLOR_DARK_GREY          ANSI_ESCAPE "[1;90m"
 
 #define MUTEST_BOLD_DEFAULT             ANSI_ESCAPE "[1;39m"
 #define MUTEST_DIM_DEFAULT              ANSI_ESCAPE "[2;39m"
