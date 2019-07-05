@@ -62,15 +62,18 @@ AC_SUBST(MUTEST_LIBS)
 
 ## Writing tests using µTest
 
-Writing a test program using µTest requires initializing the test framework
-and gathering the results. For convenience, µTest provides a simple macro
-meant to replace the `main` entry point of any C binary:
+Writing a test program using µTest requires initializing the test framework,
+defining the various tests, and gathering the results. For convenience, µTest
+provides a simple macro meant to replace the `main` entry point of any C
+binary:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 MUTEST_MAIN (
   // your code goes here
 )
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The `MUTEST_MAIN` macro will initialize µTest and print the report.
 
 Each µTest-based test starts from a *suite*, which is created by calling
 `mutest_describe()` in the main entry point of your test binary:
