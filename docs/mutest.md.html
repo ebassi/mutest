@@ -37,7 +37,10 @@ mutest_dep = dependency('mutest-1',
 )
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `static` option will build µTest as an uninstalled static library.
+!!! Note
+    The `static` option will build µTest as an uninstalled static library.
+    You can remove the `default_options` argument to get an installed
+    shared library.
 
 µTest can also build a shared library and a [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/)
 file to describe the necessary compiler and linker flags, if you want to
