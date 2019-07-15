@@ -145,7 +145,15 @@ update_term_caps (void)
       return;
     }
 
-  char *env = mutest_getenv ("FORCE_COLOR");
+  char *env = mutest_getenv ("MUTEST_NO_COLOR");
+  if (env != NULL && env[0] != '\0')
+    {
+      global_state.use_colors = false;
+      free (env);
+      return;
+    }
+
+  env = mutest_getenv ("FORCE_COLOR");
   if (env != NULL && env[0] != '\0')
     {
       global_state.use_colors = true;
