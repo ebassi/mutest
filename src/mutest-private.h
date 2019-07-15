@@ -240,6 +240,10 @@ char *
 mutest_strdup (const char *str);
 
 char *
+mutest_strndup (const char *str,
+                size_t len);
+
+char *
 mutest_getenv (const char *env_name);
 
 void
@@ -289,6 +293,11 @@ mutest_get_current_time (void);
 double
 mutest_format_time (int64_t t,
                     const char **unit);
+
+char *
+mutest_format_string_for_display (const char *str,
+                                  char indent_ch,
+                                  size_t indent_len);
 
 void
 mutest_expect_res_to_string (mutest_expect_res_t *res,

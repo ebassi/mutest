@@ -87,6 +87,27 @@ mutest_strdup (const char *str)
 }
 
 char *
+mutest_strndup (const char *str,
+                size_t len)
+{
+  if (str == NULL || len == 0)
+    return NULL;
+
+  size_t str_len = strlen (str) + 1;
+  if (len >= str_len)
+    return mutest_strdup (str);
+
+  char *res = malloc (len * sizeof (char));
+  if (res == NULL)
+    mutest_oom_abort ();
+
+  memcpy (res, str, len * sizeof (char));
+  res[len] = '\0';
+
+  return res;
+}
+
+char *
 mutest_getenv (const char *str)
 {
 #ifdef HAVE__DUPENV_S
@@ -117,7 +138,7 @@ mutest_print (FILE *stream,
     {
 #ifdef OS_WINDOWS
       if (fragment[0] != '\0')
-        fprintf (stream, "%s", fragment);
+        fputs (stream, fragment);
 #else
       if (fragment[0] != '\0')
         write (fileno (stream), fragment, strlen (fragment));
@@ -185,6 +206,139 @@ mutest_format_time (int64_t t,
 
   *unit = "µs";
   return (double) t;
+}
+
+static char *
+mutest_stpcpy (char *dest,
+               const char *src)
+{
+#ifdef HAVE_STPCPY
+  return stpcpy (dest, src);
+#else
+  char *d = dest;
+  const char *s = src;
+
+  do
+    *d++ = *s;
+  while (*s++ != '\0');
+
+  return d - 1;
+#endif
+}
+
+static char *
+string_split (const char *str,
+              char indent_ch,
+              size_t indent_len,
+              size_t max_width)
+{
+  const size_t max_len = max_width - indent_len;
+
+  size_t n_lines = 0;
+  char **lines = malloc (sizeof (char *) * 16);
+  if (mutest_unlikely (lines == NULL))
+    mutest_oom_abort ();
+
+  const char *p = str;
+  while (*p != '\0')
+    {
+      size_t remainder = strlen (p);
+      const char *line_start = p;
+      const char *line_end = line_start + remainder;
+
+      size_t line_len = line_end - line_start;
+      bool trailing_space = false;
+
+      if (line_len > max_len)
+        {
+          line_len = max_len - 1;
+          line_end = line_start + line_len;
+
+          while (line_len > 0)
+            {
+              if (*line_end == ' ')
+                {
+                  trailing_space = true;
+                  break;
+                }
+
+              line_end -= 1;
+              line_len -= 1;
+            }
+        }
+      char *line = malloc (sizeof (char) * (line_len + 1));
+      if (mutest_unlikely (line == NULL))
+        mutest_oom_abort ();
+
+      memcpy (line, p, line_len);
+      line[line_len] = '\0';
+
+      if ((n_lines + 1) % 16 == 0)
+        lines = realloc (lines, sizeof (char *) * (16 + n_lines));
+
+      lines[n_lines] = line;
+
+      p += line_len + (trailing_space ? 1 : 0);
+      n_lines += 1;
+    }
+
+  size_t len = strlen (lines[0]) + 1;
+  size_t i;
+
+  for (i = 1; i < n_lines; i++)
+    len += indent_len + strlen (lines[i]);
+  len += 1 * (i - 1);
+
+  char *indent = NULL;
+  if (indent_len > 0)
+    {
+      indent = malloc (sizeof (char) * (indent_len + 1));
+      if (mutest_unlikely (indent == NULL))
+        mutest_oom_abort ();
+
+      for (i = 0; i < indent_len; i++)
+        indent[i] = indent_ch;
+
+      indent[indent_len] = '\0';
+    }
+
+  char *res = malloc (sizeof (char) * len);
+  if (mutest_unlikely (res == NULL))
+    mutest_oom_abort ();
+
+  char *ptr = mutest_stpcpy (res, *lines);
+  for (i = 1; i < n_lines; i++)
+    {
+      ptr = mutest_stpcpy (ptr, "\n");
+      if (indent != NULL)
+        ptr = mutest_stpcpy (ptr, indent);
+      ptr = mutest_stpcpy (ptr, lines[i]);
+      free (lines[i]);
+    }
+
+  res[len] = '\0';
+
+  free (indent);
+  free (lines);
+
+  return res;
+}
+
+
+char *
+mutest_format_string_for_display (const char *str,
+                                  char indent_ch,
+                                  size_t indent_len)
+{
+  mutest_state_t *state = mutest_get_global_state ();
+
+  if (!state->is_tty)
+    return mutest_strdup (str);
+
+  if ((size_t) state->term_width > (strlen (str) + indent_len))
+    return mutest_strdup (str);
+
+  return string_split (str, indent_ch, indent_len, state->term_width);
 }
 
 static struct {
