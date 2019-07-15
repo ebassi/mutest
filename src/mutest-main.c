@@ -209,12 +209,36 @@ update_term_size (void)
 static void
 update_output_format (void)
 {
+  static const struct {
+    const char *name;
+    mutest_output_format_t format;
+  } available_formats[] = {
+    { NULL, MUTEST_OUTPUT_MOCHA },
+    { "tap", MUTEST_OUTPUT_TAP },
+    { "mocha", MUTEST_OUTPUT_MOCHA },
+    { "default", MUTEST_OUTPUT_MOCHA },
+  };
+
+  const size_t n_available_formats =
+    sizeof (available_formats) / sizeof (available_formats[0]);
+
   char *env = mutest_getenv ("MUTEST_OUTPUT");
 
-  if (env != NULL && strcmp (env, "tap") == 0)
-    global_state.output_format = MUTEST_OUTPUT_TAP;
-  else
-    global_state.output_format = MUTEST_OUTPUT_MOCHA;
+  if (env == NULL || *env == '\0')
+    {
+      // Default
+      global_state.output_format = available_formats[0].format;
+      return;
+    }
+
+  for (size_t i = 1; i < n_available_formats; i++)
+    {
+      if (strcmp (env, available_formats[i].name) == 0)
+        {
+          global_state.output_format = available_formats[i].format;
+          break;
+        }
+    }
 
   free (env);
 }
