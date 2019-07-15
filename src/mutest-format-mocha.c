@@ -7,6 +7,8 @@
 
 #include "mutest-private.h"
 
+#include <string.h>
+
 static void
 mocha_suite_preamble (mutest_suite_t *suite)
 {
@@ -23,57 +25,87 @@ mocha_suite_preamble (mutest_suite_t *suite)
                   NULL);
 }
 
+static const char *
+indent_expect (void)
+{
+  return "      ";
+}
+
 static void
 mocha_expect_result (mutest_expect_t *expect)
 {
+  // indentation of every line after the first is the indentation
+  // of the first line plus the result glyph
+  size_t indent_len = strlen (indent_expect ()) + 3;
+  char *description =
+    mutest_format_string_for_display (expect->description,
+                                      ' ',
+                                      indent_len);
+
   switch (expect->result)
     {
     case MUTEST_RESULT_PASS:
       if (mutest_use_colors ())
         mutest_print (stdout,
-                      "     ",
-                      MUTEST_COLOR_GREEN, " ✓ ", MUTEST_DIM_DEFAULT, expect->description,
+                      indent_expect (),
+                      MUTEST_COLOR_GREEN, "✓ ", MUTEST_DIM_DEFAULT, description,
                       MUTEST_COLOR_NONE,
                       NULL);
       else
         mutest_print (stdout,
-                      "      ✓ ", expect->description,
+                      indent_expect (),
+                      "✓ ", description,
                       NULL);
       break;
 
     case MUTEST_RESULT_FAIL:
       if (mutest_use_colors ())
         mutest_print (stdout,
-                      "     ",
-                      MUTEST_COLOR_RED, " ✗ ", expect->description, MUTEST_COLOR_NONE,
+                      indent_expect (),
+                      MUTEST_COLOR_RED, "✗ ", description, MUTEST_COLOR_NONE,
                       NULL);
       else
         mutest_print (stdout,
-                      "      ✗ ", expect->description,
+                      indent_expect (),
+                      "✗ ", description,
                       NULL);
       break;
 
     case MUTEST_RESULT_SKIP:
       if (mutest_use_colors ())
         mutest_print (stdout,
-                      "     ",
-                      MUTEST_COLOR_YELLOW, " - ", expect->description, MUTEST_COLOR_NONE,
+                      indent_expect (),
+                      MUTEST_COLOR_YELLOW, "Θ ", description, MUTEST_COLOR_NONE,
                       NULL);
       else
         mutest_print (stdout,
-                      "      - ", expect->description,
+                      indent_expect (),
+                      "Θ ", description,
                       NULL);
       break;
     }
+
+  free (description);
+}
+
+static const char *
+indent_spec (void)
+{
+  return "    ";
 }
 
 static void
 mocha_spec_preamble (mutest_spec_t *spec)
 {
+  char *description =
+    mutest_format_string_for_display (spec->description, ' ', strlen (indent_spec ()));
+
   mutest_print (stdout,
-                "    ",
-                spec->description,
+                indent_spec (),
+                description,
                 NULL);
+
+  free (description);
 }
 
 static void
@@ -81,24 +113,33 @@ mocha_spec_results (mutest_spec_t *spec)
 {
   if (spec->skip_all)
     {
+      char *reason =
+        mutest_format_string_for_display (spec->skip_reason != NULL
+                                            ? spec->skip_reason
+                                            : "unknown reason",
+                                          ' ',
+                                          strlen (indent_spec ()) + strlen ("skipped: "));
+
       if (mutest_use_colors ())
         {
           mutest_print (stdout,
-                        "    ",
+                        indent_spec (),
                         MUTEST_COLOR_YELLOW, "skipped: ",
                         MUTEST_COLOR_DARK_GREY,
-                        spec->skip_reason != NULL ? spec->skip_reason : "unknown",
+                        reason,
                         MUTEST_COLOR_NONE,
                         NULL);
         }
       else
         {
           mutest_print (stdout,
-                        "    ",
+                        indent_spec (),
                         "skipped: ",
-                        spec->skip_reason != NULL ? spec->skip_reason : "unknown",
+                        reason,
                         NULL);
         }
+
+      free (reason);
 
       return;
     }
@@ -120,31 +161,32 @@ mocha_spec_results (mutest_spec_t *spec)
     {
       mutest_print (stdout,
                     "\n",
-                    "      ",
+                    indent_expect (),
                     MUTEST_COLOR_GREEN, passing_s, MUTEST_COLOR_NONE, " ",
                     MUTEST_COLOR_DARK_GREY, delta_s, MUTEST_COLOR_NONE,
                     NULL);
 
       if (spec->skip != 0)
         mutest_print (stdout,
-                      "      ",
+                      indent_expect (),
                       MUTEST_COLOR_YELLOW, skipped_s, MUTEST_COLOR_NONE,
                       NULL);
 
       if (spec->fail != 0)
         mutest_print (stdout,
-                      "      ",
+                      indent_expect (),
                       MUTEST_COLOR_RED, failing_s, MUTEST_COLOR_NONE,
                       NULL);
 
+      // Emit a newline
       mutest_print (stdout, "", NULL);
     }
   else
     mutest_print (stdout,
                   "\n",
-                  "      ", passing_s, " ", delta_s, "\n",
-                  "      ", skipped_s, "\n",
-                  "      ", failing_s, "\n",
+                  indent_expect (), passing_s, " ", delta_s, "\n",
+                  indent_expect (), skipped_s, "\n",
+                  indent_expect (), failing_s, "\n",
                   NULL);
 }
 
@@ -153,6 +195,12 @@ mocha_suite_results (mutest_suite_t *suite)
 {
   if (suite->skip_all)
     {
+      char *reason =
+        mutest_format_string_for_display (suite->skip_reason != NULL
+                                            ? suite->skip_reason
+                                            : "unknown reason",
+                                          ' ',
+                                          2 + strlen ("skipped: "));
       if (mutest_use_colors ())
         {
           mutest_print (stdout,
@@ -160,7 +208,7 @@ mocha_suite_results (mutest_suite_t *suite)
                         "  ",
                         MUTEST_COLOR_YELLOW, "skipped: ",
                         MUTEST_COLOR_DARK_GREY,
-                        suite->skip_reason != NULL ? suite->skip_reason : "unknown",
+                        reason,
                         MUTEST_COLOR_NONE,
                         NULL);
         }
@@ -170,9 +218,11 @@ mocha_suite_results (mutest_suite_t *suite)
                         "\n",
                         "  ",
                         "skipped: ",
-                        suite->skip_reason != NULL ? suite->skip_reason : "unknown",
+                        reason,
                         NULL);
         }
+
+      free (reason);
     }
 }
 
@@ -220,10 +270,10 @@ mocha_total_results (mutest_state_t *state)
   else
     mutest_print (stdout,
                   "\n",
-                  "  Total\n",
-                  "  ", passing_s, " ", delta_s, "\n",
-                  "  ", skipped_s, "\n",
-                  "  ", failing_s, "\n",
+                  "Total\n",
+                  passing_s, " ", delta_s, "\n",
+                  skipped_s, "\n",
+                  failing_s, "\n",
                   NULL);
 }
 
@@ -242,7 +292,7 @@ mocha_expect_fail (mutest_expect_t *expect,
   if (mutest_use_colors ())
     {
       mutest_print (stdout,
-                    "      ",
+                    indent_expect (),
                     MUTEST_COLOR_RED,
                     "Assertion failure: ", diagnostic,
                     " at ", location,
@@ -252,7 +302,7 @@ mocha_expect_fail (mutest_expect_t *expect,
   else
     {
       mutest_print (stdout,
-                    "      ",
+                    indent_expect (),
                     "Assertion failure: ", diagnostic,
                     " at ", location,
                     NULL);
