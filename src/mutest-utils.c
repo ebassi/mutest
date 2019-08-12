@@ -203,7 +203,7 @@ mutest_print (FILE *stream,
     {
 #ifdef OS_WINDOWS
       if (fragment[0] != '\0')
-        fputs (stream, fragment);
+        fputs (fragment, stream);
 #else
       if (fragment[0] != '\0')
         write (fileno (stream), fragment, strlen (fragment));
