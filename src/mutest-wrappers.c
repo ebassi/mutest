@@ -119,7 +119,6 @@ mutest_expect_res_t *
 mutest_expect_res_alloc (mutest_expect_type_t type)
 {
   mutest_expect_res_t *retval = calloc (1, sizeof (mutest_expect_res_t));
-
   if (retval == NULL)
     mutest_oom_abort ();
 
@@ -131,11 +130,10 @@ mutest_expect_res_alloc (mutest_expect_type_t type)
 mutest_expect_res_t *
 mutest_bool_value (bool value)
 {
-  mutest_expect_res_t *res = malloc (sizeof (mutest_expect_res_t));
+  mutest_expect_res_t *res = mutest_expect_res_alloc (MUTEST_EXPECT_BOOLEAN);
   if (res == NULL)
     mutest_oom_abort ();
 
-  res->expect_type = MUTEST_EXPECT_BOOLEAN;
   res->expect.v_bool = value;
 
   return res;
@@ -153,11 +151,8 @@ mutest_get_bool_value (const mutest_expect_res_t *res)
 mutest_expect_res_t *
 mutest_int_value (int value)
 {
-  mutest_expect_res_t *res = malloc (sizeof (mutest_expect_res_t));
-  if (res == NULL)
-    mutest_oom_abort ();
+  mutest_expect_res_t *res = mutest_expect_res_alloc (MUTEST_EXPECT_INT);
 
-  res->expect_type = MUTEST_EXPECT_INT;
   res->expect.v_int.value = value;
   res->expect.v_int.tolerance = 0;
 
@@ -176,16 +171,9 @@ mutest_get_int_value (const mutest_expect_res_t *res)
 mutest_expect_res_t *
 mutest_string_value (const char *value)
 {
-  mutest_expect_res_t *res = malloc (sizeof (mutest_expect_res_t));
-  if (res == NULL)
-    mutest_oom_abort ();
+  mutest_expect_res_t *res = mutest_expect_res_alloc (MUTEST_EXPECT_STR);
 
-  res->expect_type = MUTEST_EXPECT_STR;
-  res->expect.v_str.str = mutest_strdup (value);
-  if (res->expect.v_str.str == NULL)
-    mutest_oom_abort ();
-
-  res->expect.v_str.len = strlen (value);
+  res->expect.v_str.str = mutest_strdup_and_len (value, &(res->expect.v_str.len));
 
   return res;
 }
@@ -202,11 +190,8 @@ mutest_get_string_value (const mutest_expect_res_t *res)
 mutest_expect_res_t *
 mutest_float_value (double value)
 {
-  mutest_expect_res_t *res = malloc (sizeof (mutest_expect_res_t));
-  if (res == NULL)
-    mutest_oom_abort ();
+  mutest_expect_res_t *res = mutest_expect_res_alloc (MUTEST_EXPECT_FLOAT);
 
-  res->expect_type = MUTEST_EXPECT_FLOAT;
   res->expect.v_float.value = value;
   res->expect.v_float.tolerance = DBL_EPSILON;
 
@@ -226,11 +211,8 @@ mutest_expect_res_t *
 mutest_int_range (int min,
                   int max)
 {
-  mutest_expect_res_t *res = malloc (sizeof (mutest_expect_res_t));
-  if (res == NULL)
-    mutest_oom_abort ();
+  mutest_expect_res_t *res = mutest_expect_res_alloc (MUTEST_EXPECT_INT_RANGE);
 
-  res->expect_type = MUTEST_EXPECT_INT_RANGE;
   res->expect.v_irange.min = min;
   res->expect.v_irange.max = max;
 
@@ -255,11 +237,8 @@ mutest_expect_res_t *
 mutest_float_range (double min,
                     double max)
 {
-  mutest_expect_res_t *res = malloc (sizeof (mutest_expect_res_t));
-  if (res == NULL)
-    mutest_oom_abort ();
+  mutest_expect_res_t *res = mutest_expect_res_alloc (MUTEST_EXPECT_FLOAT_RANGE);
 
-  res->expect_type = MUTEST_EXPECT_FLOAT_RANGE;
   res->expect.v_frange.min = min;
   res->expect.v_frange.max = max;
 
@@ -283,11 +262,8 @@ mutest_get_float_range (const mutest_expect_res_t *res,
 mutest_expect_res_t *
 mutest_pointer (const void *pointer)
 {
-  mutest_expect_res_t *res = malloc (sizeof (mutest_expect_res_t));
-  if (res == NULL)
-    mutest_oom_abort ();
+  mutest_expect_res_t *res = mutest_expect_res_alloc (MUTEST_EXPECT_POINTER);
 
-  res->expect_type = MUTEST_EXPECT_POINTER;
   res->expect.v_pointer = (void *) pointer;
 
   return res;
