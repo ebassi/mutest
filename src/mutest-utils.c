@@ -121,19 +121,34 @@ mutest_get_current_time (void)
 #endif
 
 char *
-mutest_strdup (const char *str)
+mutest_strdup_and_len (const char *str,
+                       size_t *len_p)
 {
   if (str == NULL)
-    return NULL;
+    {
+      if (len_p != NULL)
+        *len_p = 0;
+
+      return NULL;
+    }
 
   size_t len = strlen (str) + 1;
   char *res = malloc (len * sizeof (char));
   if (res == NULL)
     mutest_oom_abort ();
 
-  memcpy (res, str, len * sizeof (char));
+  memcpy (res, str, len);
+
+  if (len_p != NULL)
+    *len_p = len - 1;
 
   return res;
+}
+
+char *
+mutest_strdup (const char *str)
+{
+  return mutest_strdup_and_len (str, NULL);
 }
 
 char *

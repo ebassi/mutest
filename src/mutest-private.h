@@ -244,6 +244,10 @@ mutest_strndup (const char *str,
                 size_t len);
 
 char *
+mutest_strdup_and_len (const char *str,
+                       size_t *len);
+
+char *
 mutest_getenv (const char *env_name);
 
 void
