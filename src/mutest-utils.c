@@ -12,18 +12,30 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
+
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
 #ifdef OS_WINDOWS
 #include <windows.h>
 #include <io.h>
+#endif
+
+#ifdef HAVE_MACH_MACH_TIME_H
+#include <mach/mach_time.h>
 #endif
 
 // mutest_get_current_time:
@@ -50,6 +62,8 @@ mutest_get_current_time (void)
   if (QueryPerformanceCounter (&ticks))
     return (int64_t) (ticks.QuadPart * usec_per_tick);
 
+  usec_per_tick = 0;
+
   return 0;
 }
 #elif defined(HAVE_CLOCK_GETTIME)
@@ -65,6 +79,42 @@ mutest_get_current_time (void)
     return 0;
 
   return (((int64_t) ts.tv_sec) * 1000000) + (ts.tv_nsec / 1000);
+}
+#elif defined(HAVE_MACH_MACH_TIME_H)
+int64_t
+mutest_get_current_time (void)
+{
+  static mach_timebase_info_data_t timebase_info;
+
+  if (timebase_info.denom == 0)
+    {
+      mach_timebase_info (&timebase_info);
+
+      if (timebase_info.number % 1000 == 0)
+        timebase_info.number /= 1000;
+      else
+        timebase_info.number *= 1000;
+
+      if (timebase_info.denom % timebase_info.number == 0)
+        {
+          timebase_info.denom /= timebase_info.number;
+          timebase_info.number = 1;
+        }
+    }
+
+  return mach_absolute_time () / timebase_info.denom;
+}
+#elif defined(HAVE_GETTIMEOFDAY)
+int64_t
+mutest_get_current_time (void)
+{
+  struct timeval r;
+
+  // Fall back to gettimeofday(); it's not even remotely monotonic,
+  // but it's likely better than nothing
+  gettimeofday (&r, NULL);
+
+  return (((int64_t) r.tv_sec) * 1000000) + r.tv_usec;
 }
 #else
 # error "muTest requires a monotonic clock implementation"

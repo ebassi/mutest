@@ -15,6 +15,7 @@ test_headers = [
   'sys/types.h',
   'unistd.h',
   'fcntl.h',
+  'mach/mach_time.h',
 ]
 
 foreach h: test_headers
@@ -27,6 +28,7 @@ endforeach
 test_functions = [
   [ 'isatty', 'unistd.h' ],
   [ 'clock_gettime', 'time.h' ],
+  [ 'gettimeofday', 'sys/time.h' ],
   [ '_dupenv_s', 'stdlib.h' ],
   [ 'stpcpy', 'string.h' ],
 ]
