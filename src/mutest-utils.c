@@ -162,7 +162,7 @@ mutest_strndup (const char *str,
   if (len >= str_len)
     return mutest_strdup (str);
 
-  char *res = malloc (len * sizeof (char));
+  char *res = malloc ((len + 1) * sizeof (char));
   if (res == NULL)
     mutest_oom_abort ();
 
@@ -367,7 +367,7 @@ string_split (const char *str,
       indent[indent_len] = '\0';
     }
 
-  char *res = malloc (sizeof (char) * len);
+  char *res = malloc (sizeof (char) * (len + 1));
   if (mutest_unlikely (res == NULL))
     mutest_oom_abort ();
 
