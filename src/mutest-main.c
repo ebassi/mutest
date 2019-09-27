@@ -193,10 +193,34 @@ update_term_size (void)
 
   if (ioctl (STDOUT_FILENO, TIOCGWINSZ, &ws) != 0)
     perror ("ioctl");
-
-  global_state.term_width = ws.ws_col;
-  global_state.term_height = ws.ws_row;
+  else
+    {
+      global_state.term_width = ws.ws_col;
+      global_state.term_height = ws.ws_row;
+      return;
+    }
 #endif
+
+  char *env = mutest_getenv ("COLUMNS");
+
+  if (env == NULL || *env == '\0')
+    {
+      free (env);
+      return;
+    }
+
+  int saved_errno = errno;
+  int columns = strtol (env, NULL, 10);
+  if (errno == ERANGE)
+    {
+      free (env);
+      return;
+    }
+
+  global_state.term_width = columns;
+  free (env);
+
+  errno = saved_errno;
 }
 
 static void
