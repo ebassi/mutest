@@ -139,26 +139,20 @@ update_term_caps (void)
   global_state.is_tty = isatty (STDOUT_FILENO);
 #endif
 
+  global_state.use_colors = false;
+
   if (!global_state.is_tty)
-    {
-      global_state.use_colors = false;
-      return;
-    }
+    return;
 
   char *env = mutest_getenv ("MUTEST_NO_COLOR");
   if (env != NULL && env[0] != '\0')
-    {
-      global_state.use_colors = false;
-      free (env);
-      return;
-    }
+    goto out;
 
   env = mutest_getenv ("FORCE_COLOR");
   if (env != NULL && env[0] != '\0')
     {
       global_state.use_colors = true;
-      free (env);
-      return;
+      goto out;
     }
 
   env = mutest_getenv ("TERM");
@@ -174,19 +168,18 @@ update_term_caps (void)
           global_state.use_colors = true;
         }
 
-      free (env);
-      return;
+      goto out;
     }
 
   env = mutest_getenv ("COLORTERM");
   if (env != NULL)
     {
       global_state.use_colors = true;
-      free (env);
-      return;
+      goto out;
     }
 
-  global_state.use_colors = false;
+out:
+  free (env);
 }
 
 static void
@@ -228,6 +221,7 @@ update_output_format (void)
     {
       // Default
       global_state.output_format = available_formats[0].format;
+      free (env);
       return;
     }
 
