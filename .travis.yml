@@ -19,9 +19,10 @@ before_script:
   - docker build -t withgit .
 
 env:
-  - BUILD_OPTS=""
-  - BUILD_OPTS="-Db_sanitize=undefined -Db_lundef=false"
-  - BUILD_OPTS="-Db_sanitize=address -Db_lundef=false"
+  jobs:
+    - BUILD_OPTS=""
+    - BUILD_OPTS="-Db_sanitize=undefined -Db_lundef=false"
+    - BUILD_OPTS="-Db_sanitize=address -Db_lundef=false"
 
 script:
   - docker run withgit /bin/sh -c "sh -x .travis-ci/run-ci.sh ${BUILD_OPTS}"
