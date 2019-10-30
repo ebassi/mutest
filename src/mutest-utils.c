@@ -297,6 +297,9 @@ string_split (const char *str,
               size_t indent_len,
               size_t max_width)
 {
+  if (indent_len >= max_width)
+    mutest_assert_if_reached ("invalid indentation length");
+
   const size_t max_len = max_width - indent_len;
 
   size_t n_lines = 0;
@@ -346,6 +349,9 @@ string_split (const char *str,
       p += line_len + (trailing_space ? 1 : 0);
       n_lines += 1;
     }
+
+  if (n_lines == 0)
+    mutest_assert_if_reached ("invalid line length");
 
   size_t len = strlen (lines[0]) + 1;
   size_t i;

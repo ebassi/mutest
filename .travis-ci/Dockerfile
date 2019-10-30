@@ -1,11 +1,14 @@
-FROM debian:stretch-slim
+FROM debian:buster-slim
 MAINTAINER Emmanuele Bassi <ebassi@gmail.com>
 
 RUN apt-get update -qq \
     && apt-get install --no-install-recommends -qq -y \
         clang \
+        clang-tools \
         gcc \
         git \
+        libasan5 \
+        libubsan1 \
         locales \
         ninja-build \
         pkg-config \
