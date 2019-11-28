@@ -18,15 +18,20 @@ before_script:
   - echo WORKDIR /home/user/app >> Dockerfile
   - docker build -t withgit .
 
-env:
-  jobs:
-    - BUILD_OPTS=""
-    - BUILD_OPTS="-Db_sanitize=undefined -Db_lundef=false"
-#    - BUILD_OPTS="-Db_sanitize=address -Db_lundef=false"
-
-script:
-  - docker run withgit /bin/sh -c "sh -x .travis-ci/run-ci.sh ${BUILD_OPTS}"
-
-after_success:
-  - docker run withgit /bin/sh -c "sh -x .travis-ci/run-static.sh"
-  - docker run withgit /bin/sh -c "sh -x .travis-ci/run-coverage.sh"
+jobs:
+  include:
+    - stage: "Tests"
+      name: "Build"
+      script: docker run withgit /bin/sh -c "sh -x .travis-ci/run-ci.sh ${BUILD_OPTS}"
+      env:
+        - BUILD_OPTS=""
+#        - BUILD_OPTS="-Db_sanitize=address -Db_lundef=false"
+    - script: docker run withgit /bin/sh -c "sh -x .travis-ci/run-ci.sh ${BUILD_OPTS}"
+      name: "UBSan"
+      env:
+        - BUILD_OPTS="-Db_sanitize=undefined -Db_lundef=false"
+    - stage: "Analysis"
+      script: docker run withgit /bin/sh -c "sh -x .travis-ci/run-static.sh"
+      name: "Code scan"
+    - script: docker run withgit /bin/sh -c "sh -x .travis-ci/run-coverage.sh"
+      name: "Coverage"
