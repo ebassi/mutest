@@ -228,7 +228,7 @@ mutest_to_be_positive_infinity (mutest_expect_t *e,
   mutest_expect_res_t *value = e->value;
 
   if (value->expect_type == MUTEST_EXPECT_FLOAT)
-    return isinf (value->expect.v_float.value) == 1;
+    return isinf (value->expect.v_float.value) != 0 && signbit (value->expect.v_float.value) == 0;
 
   return false;
 }
@@ -240,7 +240,7 @@ mutest_to_be_negative_infinity (mutest_expect_t *e,
   mutest_expect_res_t *value = e->value;
 
   if (value->expect_type == MUTEST_EXPECT_FLOAT)
-    return isinf (value->expect.v_float.value) == -1;
+    return isinf (value->expect.v_float.value) != 0 && signbit (value->expect.v_float.value) != 0;
 
   return false;
 }
