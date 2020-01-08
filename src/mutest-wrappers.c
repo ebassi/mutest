@@ -80,11 +80,11 @@ mutest_expect_res_to_string (mutest_expect_res_t *res,
         {
           snprintf (buf, len, "%s", "NaN");
         }
-      else if (isinf (res->expect.v_float.value) == 1)
+      else if (isinf (res->expect.v_float.value) && signbit (res->expect.v_float.value) == 0)
         {
           snprintf (buf, len, "%s", "+∞");
         }
-      else if (isinf (res->expect.v_float.value) == -1)
+      else if (isinf (res->expect.v_float.value) && signbit (res->expect.v_float.value) != 0)
         {
           snprintf (buf, len, "%s", "-∞");
         }
