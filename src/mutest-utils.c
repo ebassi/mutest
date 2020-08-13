@@ -206,7 +206,15 @@ mutest_print (FILE *stream,
         fputs (fragment, stream);
 #else
       if (fragment[0] != '\0')
-        write (fileno (stream), fragment, strlen (fragment));
+        {
+          size_t fragment_len = strlen (fragment);
+          ssize_t res = write (fileno (stream), fragment, fragment_len);
+          if (res < 0)
+            {
+              perror ("write");
+              abort ();
+            }
+        }
 #endif
 
       fragment = va_arg (args, char *);
@@ -217,7 +225,11 @@ mutest_print (FILE *stream,
 #ifdef OS_WINDOWS
   fputc ('\n', stream);
 #else
-  write (fileno (stream), "\n", 1);
+  if (write (fileno (stream), "\n", 1) < 0)
+    {
+      perror ("write");
+      abort ();
+    }
 #endif
 }
 
