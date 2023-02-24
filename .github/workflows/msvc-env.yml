@@ -1,0 +1,28 @@
+name: MSVC Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      PYTHONIOENCODING: "utf-8"
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/setup-python@v1
+    - uses: seanmiddleditch/gha-setup-vsdevenv@master
+    - name: Build
+      uses: BSFishy/meson-build@v1.0.3
+      with:
+        action: build
+        meson-version: "1.0.0"
+    - name: Test
+      uses: BSFishy/meson-build@v1.0.3
+      with:
+        action: test
+        meson-version: "1.0.0"
+
