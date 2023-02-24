@@ -89,6 +89,7 @@ typedef struct {
 } mutest_state_t;
 
 typedef struct {
+  void (* main_preamble) (void);
   void (* suite_preamble) (mutest_suite_t *suite);
   void (* spec_preamble) (mutest_spec_t *spec);
   void (* expect_result) (mutest_expect_t *expect);
@@ -331,6 +332,9 @@ int
 mutest_get_results (int *total_pass,
                     int *total_fail,
                     int *total_skip);
+
+void
+mutest_format_main_preamble (void);
 
 void
 mutest_format_suite_preamble (mutest_suite_t *suite);

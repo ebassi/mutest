@@ -286,6 +286,8 @@ mutest_init (void)
   global_state.start_time = mutest_get_current_time ();
 
   global_state.initialized = true;
+
+  mutest_format_main_preamble ();
 }
 
 mutest_output_format_t

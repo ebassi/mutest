@@ -75,6 +75,12 @@ tap_suite_preamble (mutest_suite_t *suite)
 }
 
 static void
+tap_main_preamble (void)
+{
+  mutest_print (stdout, "TAP version 14", NULL);
+}
+
+static void
 tap_total_results (mutest_state_t *state MUTEST_UNUSED)
 {
   int n_tests, n_skipped;
@@ -97,6 +103,7 @@ const mutest_formatter_t *
 mutest_get_tap_formatter (void)
 {
   static mutest_formatter_t tap = {
+    .main_preamble = tap_main_preamble,
     .suite_preamble = tap_suite_preamble,
     .spec_preamble = tap_spec_preamble,
     .expect_result = tap_expect_result,

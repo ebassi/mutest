@@ -316,6 +316,7 @@ const mutest_formatter_t *
 mutest_get_mocha_formatter (void)
 {
   static mutest_formatter_t mocha = {
+    .main_preamble = NULL,
     .suite_preamble = mocha_suite_preamble,
     .spec_preamble = mocha_spec_preamble,
     .expect_result = mocha_expect_result,

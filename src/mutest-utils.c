@@ -492,6 +492,15 @@ mutest_format_suite_preamble (mutest_suite_t *suite)
 }
 
 void
+mutest_format_main_preamble (void)
+{
+  const mutest_formatter_t *vtable = mutest_get_formatter ();
+
+  if (vtable->main_preamble != NULL)
+    vtable->main_preamble ();
+}
+
+void
 mutest_format_expect_fail (mutest_expect_t *expect,
                            bool negate,
                            mutest_expect_res_t *check,
