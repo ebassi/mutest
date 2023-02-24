@@ -1,9 +1,5 @@
 ## µTest - A small C testing library
 
- - **Linux**: [![Build Status](https://travis-ci.org/ebassi/mutest.svg?branch=master)](https://travis-ci.org/ebassi/mutest)
- - **Windows**: [![Build status](https://ci.appveyor.com/api/projects/status/1ghtdpt42u3vy8s9/branch/master?svg=true)](https://ci.appveyor.com/project/ebassi/mutest/branch/master)
- - [![Coverage Status](https://coveralls.io/repos/github/ebassi/mutest/badge.svg?branch=master)](https://coveralls.io/github/ebassi/mutest?branch=master)
-
 ## What is µTest
 
 µTest aims to be a small unit testing library for C projects, with an API
