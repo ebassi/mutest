@@ -49,20 +49,6 @@ endif
 
 configure_file(output: 'config.h', configuration: config_h)
 
-test_link_args = []
-if host_machine.system() == 'linux' and cc.get_id() == 'gcc'
-  test_link_args += [
-  ]
-endif
-if host_machine.system() == 'darwin'
-  test_link_args += [
-    '-compatibility_version 1',
-    '-current_version 1.0',
-  ]
-endif
-
-mutest_link_args = cc.get_supported_link_arguments(test_link_args)
-
 if static
   mutest_lib = static_library(
     mutest_api_path,
@@ -85,7 +71,8 @@ else
     ],
     dependencies: cc.find_library('m', required: false),
     include_directories: headers_inc,
-    link_args: mutest_link_args,
+    darwin_versions: ['1', '1.0'],
+    gnu_symbol_visibility: 'hidden',
   )
 endif
 

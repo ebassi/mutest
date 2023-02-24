@@ -20,10 +20,10 @@ mutest_api_version = 1
 mutest_soversion = '@0@.@1@.@2@'.format(0, mutest_major, mutest_minor)
 
 mutest_prefix = get_option('prefix')
-mutest_libdir = join_paths(mutest_prefix, get_option('libdir'))
-mutest_datadir = join_paths(mutest_prefix, get_option('datadir'))
-mutest_includedir = join_paths(mutest_prefix, get_option('includedir'))
-mutest_libexecdir = join_paths(mutest_prefix, get_option('libexecdir'))
+mutest_libdir = mutest_prefix / get_option('libdir')
+mutest_datadir = mutest_prefix / get_option('datadir')
+mutest_includedir = mutest_prefix / get_option('includedir')
+mutest_libexecdir = mutest_prefix / get_option('libexecdir')
 
 mutest_api_path = '@0@-@1@'.format(meson.project_name(), mutest_api_version)
 
@@ -100,17 +100,12 @@ if get_option('default_library') != 'static'
   if host_system == 'windows'
     config_h.set('DLL_EXPORT', true)
     config_h.set('MUTEST_PUBLIC', '__declspec(dllexport) extern')
-    if cc.get_id() != 'msvc'
-      add_project_arguments(['-fvisibility=hidden'], language: 'c')
-    endif
   else
     config_h.set('MUTEST_PUBLIC', '__attribute__((visibility("default"))) extern')
-    add_project_arguments(['-fvisibility=hidden'], language: 'c')
   endif
 endif
 
-buildtype = get_option('buildtype')
-if buildtype.startswith('debug')
+if get_option('debug')
   add_project_arguments([ '-DMUTEST_ENABLE_DEBUG' ], language: 'c')
 endif
 
